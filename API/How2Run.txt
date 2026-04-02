@@ -1,31 +1,33 @@
-  How to run
+How to run
 
-  Step 1 — Start the server (once, from the project root):
-  uvicorn API.main:app --host 0.0.0.0 --port 8000
+COMMAND: cd API && uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-  Step 2 — Run the test script:
-  # Basic — results saved to ./api_results/<image_name>/
-  python3 API/test_api.py /path/to/fundus.jpg
+Step 1 — Start the server (once, from the project root):
+uvicorn API.main:app --host 0.0.0.0 --port 8000
 
-  # Custom output folder
-  python3 API/test_api.py /path/to/fundus.jpg ./my_results
+Step 2 — Run the test script:
+# Basic — results saved to ./api_results/<image_name>/
+python3 API/test_api.py /path/to/fundus.jpg
 
-  # Lower threshold (catch more diseases)
-  python3 API/test_api.py /path/to/fundus.jpg ./my_results --threshold 0.3
+# Custom output folder
+python3 API/test_api.py /path/to/fundus.jpg ./my_results
 
-  # Show top-5 classes even if nothing is detected
-  python3 API/test_api.py /path/to/fundus.jpg ./my_results --top-k 5
+# Lower threshold (catch more diseases)
+python3 API/test_api.py /path/to/fundus.jpg ./my_results --threshold 0.3
 
-  Output structure per image
+# Show top-5 classes even if nothing is detected
+python3 API/test_api.py /path/to/fundus.jpg ./my_results --top-k 5
 
-  my_results/
-  └── <image_name>/
-      ├── original.png                    ← preprocessed fundus
-      ├── predictions.json                ← all 19 classes with probabilities
-      └── <CODE>_<Disease>_<prob>/        ← one folder per detected class
-          ├── heatmap.png                 ← raw GradCAM (JET colormap)
-          ├── overlay.png                 ← GradCAM blended on fundus
-          ├── polygon_overlay.png         ← hot-region contour + fill
-          ├── bounding_box.png            ← bounding rectangles + label
-          └── panel.png                   ← 2×2 comparison panel
+Output structure per image
+
+my_results/
+└── <image_name>/
+    ├── original.png                    ← preprocessed fundus
+    ├── predictions.json                ← all 19 classes with probabilities
+    └── <CODE>_<Disease>_<prob>/        ← one folder per detected class
+        ├── heatmap.png                 ← raw GradCAM (JET colormap)
+        ├── overlay.png                 ← GradCAM blended on fundus
+        ├── polygon_overlay.png         ← hot-region contour + fill
+        ├── bounding_box.png            ← bounding rectangles + label
+        └── panel.png                   ← 2×2 comparison panel
 
