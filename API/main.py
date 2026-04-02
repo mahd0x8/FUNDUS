@@ -14,9 +14,14 @@ Or from inside the API/ folder:
 """
 
 import os
+import sys
 import threading
 from contextlib import asynccontextmanager
 from typing import List, Optional
+
+# Ensure the API/ directory is on sys.path so sibling modules
+# (predictor, visualizer) resolve correctly regardless of cwd.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import torch
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
