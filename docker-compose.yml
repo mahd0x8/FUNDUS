@@ -1,0 +1,55 @@
+services:
+
+  # ── Backend: FastAPI inference service ──────────────────────────────────────
+  api:
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+    volumes:
+      # Mount the model checkpoint read-only — never bake 89 MB into the image
+      - ./EXPERIMENTS/V1/best_classifier.pt:/app/model/best_classifier.pt:ro
+    environment:
+      CHECKPOINT_PATH: /app/model/best_classifier.pt
+      DEVICE: cpu        # change to "cuda" and enable the GPU section below for GPU
+    networks:
+      - fundus
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s   # model loading can take a moment
+
+    # ── GPU support (uncomment to enable) ─────────────────────────────────────
+    # Requires: NVIDIA Container Toolkit installed on the host.
+    # Also change DEVICE above to "cuda" and the Dockerfile base/torch to CUDA.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # ── Frontend: React app served by nginx ─────────────────────────────────────
+  app:
+    build:
+      context: ./APP
+      dockerfile: Dockerfile
+      args:
+        # /api is proxied by nginx to the backend — no host URL needed at build time
+        VITE_API_BASE_URL: /api
+    ports:
+      - "3000:80"         # open http://localhost:3000 in your browser
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - fundus
+    restart: unless-stopped
+
+networks:
+  fundus:
+    driver: bridge

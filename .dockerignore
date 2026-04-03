@@ -1,0 +1,11 @@
+DATASET/
+DATA CLEANING/
+TRAINING/
+INFERENCE/
+DOCUMENTS/
+UTILS/
+APP/node_modules/
+APP/dist/
+**/__pycache__/
+**/*.pyc
+.git/

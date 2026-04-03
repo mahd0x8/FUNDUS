@@ -1,0 +1,48 @@
+---
+  Files created
+
+  FUNDUS/
+  ├── docker-compose.yml          ← single command to run everything
+  ├── .dockerignore               ← keeps large folders out of build context
+  ├── API/
+  │   ├── Dockerfile              ← python:3.11-slim + CPU PyTorch + OpenCV
+  │   └── .dockerignore
+  └── APP/
+      ├── Dockerfile              ← multi-stage: node:20-alpine build → nginx:alpine serve
+      ├── nginx.conf              ← proxies /api/ → backend, SPA fallback
+      ├── .dockerignore
+      └── src/vite-env.d.ts       ← fixes import.meta.env TypeScript types
+
+  How it works
+
+  Browser → http://localhost:3000
+              │
+              ├── /         → nginx serves React SPA (static)
+              └── /api/*    → nginx proxies to http://api:8000/*
+                                  │
+                                  └── FastAPI (model checkpoint mounted read-only)
+
+  The model checkpoint (EXPERIMENTS/V1/best_classifier.pt) is never baked into the image — it's bind-mounted
+  at runtime, so rebuilding the image doesn't re-copy 89 MB.
+
+  Commands
+
+  ┌───────────────────────────┬──────────────────────────────────────────────┐
+  │          Action           │                   Command                    │
+  ├───────────────────────────┼──────────────────────────────────────────────┤
+  │ Build & start             │ cd FUNDUS && docker compose up -d            │
+  ├───────────────────────────┼──────────────────────────────────────────────┤
+  │ Stop                      │ docker compose down                          │
+  ├───────────────────────────┼──────────────────────────────────────────────┤
+  │ View logs                 │ docker compose logs -f                       │
+  ├───────────────────────────┼──────────────────────────────────────────────┤
+  │ Rebuild after code change │ docker compose build && docker compose up -d │
+  ├───────────────────────────┼──────────────────────────────────────────────┤
+  │ Open app                  │ http://localhost:3000                        │
+  └───────────────────────────┴──────────────────────────────────────────────┘
+
+  GPU support
+
+  Uncomment the deploy.resources block in docker-compose.yml, change DEVICE: cpu to DEVICE: cuda, and update
+  the Dockerfile torch install to use the CUDA index URL. Requires NVIDIA Container Toolkit on the host.
+
