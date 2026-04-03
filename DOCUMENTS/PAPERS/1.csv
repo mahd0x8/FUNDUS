@@ -1,0 +1,11 @@
+Title,Year,Dataset,Classes,Architecture,Best Metric,Key Innovation
+Multi-class Classification... Using Transfer Learning-Based ViT,2025,EyePACS / Ophthal.,4,AugReg ViT-L/16,98.1% Acc,Use of augmented-regularized pre-trained Vision Transformers.
+Enhancing Multi-Class Performance... Using Deep Learning Models,2025,Eye Diseases Dataset,4,DenseNet121 + RF Bagging,99.4% Acc,Hybrid ensemble of CNN backbones with Random Forest bagging.
+Automated Retinal Disease Classification... and AlexNet,2025,Private / Combined,4,AlexNet / EfficientNet-B7,93.65% Acc,Statistical validation of lightweight vs. deep models for screening.
+Retinal Multi-Disease Classification through Fundus Image,2025,RFMiD,4+,EyeDeep-Net (Custom CNN),90.34% Acc,Multi-layer custom CNN optimized for low computational demand.
+Fundus-DeepNet: Automated Multi-label Classification,2024,ODIR / Private,8,DRBM + Softmax,92.66% Score,Integration of feature representations from bilateral eye pairs.
+Multi-Class Classification of Retinal Images in DR,2023,APTOS / DDR,5,ResNet152 + YOLOv3,89.0% Acc,Fusion of classification (CNN) and lesion localization (YOLO).
+Multi-class Classification Approach for Retinal Diseases,2023,MURED,20,VGG / ResNet / GoogleNet,88.0% AUC,Benchmarking transfer learning on high-cardinality (20-class) data.
+Deep Learning for Comprehensive Analysis...,2024,RFMiD / ODIR,6+,EfficientNet-B0,0.96 AUC,"Multi-scenario evaluation (Diabetes, Hypertension, Drusen)."
+Evaluation of classification performance... in OCT/Fundus,2025,Private Lesion Set,7,ViT-Base (S2 Strategy),93.61% Acc,Multi-source data fusion strategy to reduce misdiagnosis of RAO/RVO.
+A Siamese-like CNN for DR Detection,2022,EyePACS,5,Inception-V3 (Siamese),0.829 Kappa,Pairwise comparison of eyes to improve grading consistency.
