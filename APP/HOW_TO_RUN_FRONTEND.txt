@@ -1,0 +1,169 @@
+============================================================
+  FUNDUS DISEASE CLASSIFIER — FRONTEND SETUP GUIDE
+============================================================
+
+COMMAND: npm run dev
+HOW to KILL: kill $(lsof -t -i:5173)
+
+PREREQUISITES
+-------------
+  • Node.js 18+ and npm 9+  (install from https://nodejs.org)
+  • The FastAPI backend must be running (see "Running the Backend" below)
+
+
+------------------------------------------------------------
+1. INSTALL DEPENDENCIES
+------------------------------------------------------------
+  From inside the APP/ folder:
+
+    npm install
+
+  This installs React, Vite, TypeScript, Tailwind CSS, and all
+  other dependencies listed in package.json.
+
+
+------------------------------------------------------------
+2. SET THE BACKEND API URL
+------------------------------------------------------------
+  The frontend reads the backend base URL from an environment
+  variable.  A .env file is already provided with the default:
+
+    VITE_API_BASE_URL=http://localhost:8000
+
+  If your backend runs on a different host or port, edit .env:
+
+    VITE_API_BASE_URL=http://192.168.1.10:8000
+
+  IMPORTANT: The variable must start with VITE_ so that Vite
+  exposes it to the browser bundle.
+
+
+------------------------------------------------------------
+3. START THE FRONTEND (development mode)
+------------------------------------------------------------
+    npm run dev
+
+  Vite will start a local dev server (default: http://localhost:5173).
+  Open that URL in your browser.
+
+  To build a production bundle:
+
+    npm run build       # outputs to dist/
+    npm run preview     # serves the production build locally
+
+
+------------------------------------------------------------
+4. RUNNING THE BACKEND
+------------------------------------------------------------
+  From the project root (FUNDUS/):
+
+    uvicorn API.main:app --host 0.0.0.0 --port 8000 --reload
+
+  Or from inside the API/ folder:
+
+    uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  Ensure the model checkpoint exists at:
+    EXPERIMENTS/V1/best_classifier.pt
+  (or set the CHECKPOINT_PATH environment variable to override).
+
+  The backend exposes:
+    GET  /health    — confirms model is loaded
+    GET  /classes   — lists all 19 disease codes + names
+    POST /predict   — main inference endpoint
+
+
+------------------------------------------------------------
+5. HOW THE FRONTEND CALLS THE BACKEND
+------------------------------------------------------------
+  Endpoint: POST /predict
+  Content-Type: multipart/form-data
+
+  Fields sent:
+    file          — the fundus image file (JPEG/PNG/BMP/TIFF/WebP)
+    threshold     — float 0–1, default 0.5
+    top_k_if_none — int, default 3
+
+  The frontend sends the image the user selects/drops into the
+  upload area, with threshold=0.5 and top_k_if_none=3.
+
+
+------------------------------------------------------------
+6. EXPECTED BACKEND RESPONSE (JSON)
+------------------------------------------------------------
+
+  {
+    "device": "cpu",
+    "threshold": 0.5,
+    "predictions": [
+      {
+        "label_code": "DR",
+        "label_name": "Diabetic Retinopathy",
+        "probability": 0.87,
+        "predicted": true
+      },
+      {
+        "label_code": "NORMAL",
+        "label_name": "Normal",
+        "probability": 0.12,
+        "predicted": false
+      }
+      // ... one entry per class (19 total), sorted by probability desc
+    ],
+    "original_image": "<base64-encoded PNG string>",
+    "visuals": [
+      {
+        "label_code": "DR",
+        "label_name": "Diabetic Retinopathy",
+        "probability": 0.87,
+        "heatmap":         "<base64-encoded PNG>",
+        "overlay":         "<base64-encoded PNG>",
+        "polygon_overlay": "<base64-encoded PNG>",
+        "bounding_box":    "<base64-encoded PNG>",
+        "panel":           "<base64-encoded PNG>"
+      }
+      // ... one entry per predicted class (or top-k if none predicted)
+    ]
+  }
+
+  All image strings are raw base64 (no data-URL prefix).
+  The frontend prepends "data:image/png;base64," before rendering.
+
+  "visuals" contains one entry per detected disease (or the top
+  top_k_if_none classes when nothing passes the threshold).
+
+
+------------------------------------------------------------
+7. WHAT THE UI DOES
+------------------------------------------------------------
+  • Upload Area  — drag-and-drop or click to select a fundus image
+  • Run Analysis — sends the image to /predict
+  • Predictions  — shows all 19 classes sorted by confidence,
+                   with a bar chart-style probability indicator.
+                   Detected classes (above threshold) are highlighted.
+  • GradCAM tabs — switch between Heatmap / Overlay / Polygon /
+                   Bounding Box / Panel views per detected class.
+  • Class buttons — if multiple classes are detected, click each
+                    to see its individual GradCAM output.
+  • Download     — download any result image as a PNG.
+  • New image    — resets the UI to upload another image.
+
+
+------------------------------------------------------------
+8. TROUBLESHOOTING
+------------------------------------------------------------
+  "Request failed: HTTP 422"
+    → The backend rejected the uploaded file type.
+      Use JPEG, PNG, BMP, TIFF, or WebP.
+
+  "Request failed: HTTP 500"
+    → Inference error on the backend.  Check the backend console.
+
+  Blank page / cannot connect
+    → Check VITE_API_BASE_URL in .env matches the running backend.
+    → Ensure the backend is started before clicking "Run Analysis".
+    → The backend has CORS enabled for all origins by default.
+
+  "model not found" on backend startup
+    → Verify EXPERIMENTS/V1/best_classifier.pt exists,
+      or set CHECKPOINT_PATH=/absolute/path/to/model.pt.
