@@ -3,6 +3,8 @@ train_swin.py — Swin-Large Transformer for multi-label fundus disease classifi
 
 Architecture : Swin-Large (timm, ImageNet-22k → 1k pretrained)
                 → Linear(1536 → 512) → GELU → Dropout(0.3) → Linear(512 → 19)
+Preprocessing: preprocessing.py pipeline applied per image before augmentation:
+                 remove_black_borders → crop_fundus (HoughCircles) → apply_clahe → resize
 Training     :
   - Differential LR  : backbone (lr_backbone=2e-5)  vs  head (lr_head=1e-4)
   - AdamW + weight_decay=1e-2
@@ -42,6 +44,8 @@ from tqdm.auto import tqdm
 sys.path.insert(0, os.path.dirname(__file__))
 from config import LABEL_COLS, CLASS_NAMES
 from dataset import FundusDataset
+from augmentation import RandomScalePadCrop
+from preprocessing import preprocess_fundus_image  # noqa: F401  (used inside FundusDataset)
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -66,35 +70,16 @@ def ensure_dir(path: str):
 
 # ============================================================
 # TRANSFORMS
-# Swin was pretrained with ImageNet mean/std — include normalization.
-# Augmentation mirrors the existing pipeline (scale-crop, flips,
-# rotation, grayscale) but adds ImageNet normalization at the end.
+# Preprocessing (border removal, fundus crop, CLAHE, resize) is
+# handled by preprocessing.py inside FundusDataset before these
+# transforms run.  RandomScalePadCrop is imported from augmentation.py
+# so the pipeline stays consistent with the rest of the project.
+# ImageNet normalization is added here because Swin-L pretrained
+# weights expect it (unlike the CNN/SupCon models).
 # ============================================================
 
 _IMAGENET_MEAN = [0.485, 0.456, 0.406]
 _IMAGENET_STD  = [0.229, 0.224, 0.225]
-
-
-class RandomScalePadCrop:
-    """Scale in [0.9, 1.1]: shrink+pad or enlarge+center-crop."""
-    def __init__(self, scale_range=(0.9, 1.1), size=224):
-        self.scale_range = scale_range
-        self.size = size
-
-    def __call__(self, img):
-        from PIL import Image as PILImage
-        scale = random.uniform(*self.scale_range)
-        w, h  = img.size
-        new_w = max(1, int(round(w * scale)))
-        new_h = max(1, int(round(h * scale)))
-        img   = img.resize((new_w, new_h), resample=PILImage.BILINEAR)
-        if scale < 1.0:
-            canvas = PILImage.new("RGB", (self.size, self.size), (0, 0, 0))
-            canvas.paste(img, ((self.size - new_w) // 2, (self.size - new_h) // 2))
-            return canvas
-        left = max(0, (new_w - self.size) // 2)
-        top  = max(0, (new_h - self.size) // 2)
-        return img.crop((left, top, left + self.size, top + self.size))
 
 
 def get_train_transform(image_size: int = 224):
