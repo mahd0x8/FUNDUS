@@ -272,16 +272,55 @@ class GradCAM:
         return cam
 
 
-def overlay_heatmap_on_image(image_rgb: np.ndarray, cam: np.ndarray, alpha: float = 0.4) -> np.ndarray:
+def get_fundus_mask(image_rgb: np.ndarray) -> np.ndarray:
+    """
+    Build a binary mask (uint8, 0/255) matching the fundus disc in a
+    preprocessed 224×224 image.  Runs HoughCircles on the image; if
+    detection fails falls back to the largest inscribed circle so the
+    mask always covers the visible retina and never the black corners.
+    """
+    h, w = image_rgb.shape[:2]
+    img_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+    circle = detect_fundus_circle(img_bgr)
+
+    mask = np.zeros((h, w), dtype=np.uint8)
+    if circle is not None:
+        cx, cy, r = circle
+    else:
+        cx, cy = w // 2, h // 2
+        r = min(w, h) // 2
+
+    cv2.circle(mask, (cx, cy), r, 255, thickness=-1)
+    return mask
+
+
+def overlay_heatmap_on_image(
+    image_rgb: np.ndarray,
+    cam: np.ndarray,
+    mask: np.ndarray,
+    alpha: float = 0.4,
+) -> np.ndarray:
+    """
+    Overlay a Grad-CAM heatmap on the fundus image, constrained to the
+    fundus disc described by `mask`.
+
+    Inside the disc  : alpha-blend of original image + JET heatmap.
+    Outside the disc : original image pixels only (no heatmap bleed).
+    """
     h, w = image_rgb.shape[:2]
     cam_resized = cv2.resize(cam, (w, h))
     cam_uint8 = np.uint8(255 * cam_resized)
+
     heatmap = cv2.applyColorMap(cam_uint8, cv2.COLORMAP_JET)
     heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
 
-    overlay = np.float32(image_rgb) * (1 - alpha) + np.float32(heatmap) * alpha
-    overlay = np.clip(overlay, 0, 255).astype(np.uint8)
-    return overlay
+    blended = np.float32(image_rgb) * (1 - alpha) + np.float32(heatmap) * alpha
+    blended = np.clip(blended, 0, 255).astype(np.uint8)
+
+    # Restore original pixels everywhere outside the fundus circle
+    inside = (mask > 0)[:, :, np.newaxis]          # [H, W, 1] bool
+    result = np.where(inside, blended, image_rgb)
+    return result.astype(np.uint8)
 
 
 # ============================================================
@@ -331,7 +370,10 @@ def save_heatmaps(
 
     original_image_path = os.path.join(output_dir, "original_image.png")
     cv2.imwrite(original_image_path, cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR))
-    
+
+    # Detect the fundus circle once; all heatmaps for this image share the mask
+    fundus_mask = get_fundus_mask(image_rgb)
+
     # target layer = layer4 (not avgpool)
     target_layer = model.encoder[-2]
     gradcam = GradCAM(model, target_layer)
@@ -347,15 +389,18 @@ def save_heatmaps(
         class_idx = LABEL_COLS.index(class_code)
 
         cam = gradcam.generate(input_tensor, class_idx)
-        overlay = overlay_heatmap_on_image(image_rgb, cam, alpha=0.4)
+        overlay = overlay_heatmap_on_image(image_rgb, cam, fundus_mask, alpha=0.4)
 
         base_name = f"{class_code}_{class_name}_{item['probability']:.4f}".replace(" ", "_")
         overlay_path = os.path.join(output_dir, f"{base_name}_overlay.png")
         heatmap_path = os.path.join(output_dir, f"{base_name}_heatmap.png")
         raw_path = os.path.join(output_dir, f"{base_name}_rawcam.npy")
 
-        cam_uint8 = np.uint8(255 * cv2.resize(cam, (image_rgb.shape[1], image_rgb.shape[0])))
+        h, w = image_rgb.shape[:2]
+        cam_uint8 = np.uint8(255 * cv2.resize(cam, (w, h)))
         heatmap_bgr = cv2.applyColorMap(cam_uint8, cv2.COLORMAP_JET)
+        # Black out heatmap pixels that fall outside the fundus disc
+        heatmap_bgr[fundus_mask == 0] = 0
 
         cv2.imwrite(overlay_path, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
         cv2.imwrite(heatmap_path, heatmap_bgr)
