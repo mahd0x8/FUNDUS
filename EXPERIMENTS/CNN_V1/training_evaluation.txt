@@ -1,0 +1,120 @@
+(.venv) xys-05@xylexa-05:~/Personal/FUNDUS$ python TRAINING/train_CNN.py
+Device : NVIDIA GeForce RTX 3060
+Split  : train=5886  val=1261  test=1262
+
+=======================================================
+  CNN TRAINING  (50 epochs)
+  Backbone LR : 1e-05   Head LR : 0.0001
+  Batch size  : 32   Dropout : 0.3
+=======================================================
+
+[CNN] Epoch 001/50  loss=0.823198  val_f1=0.2519  time=391.1s ★                                                                                                         
+[CNN] Epoch 002/50  loss=0.594807  val_f1=0.3804  time=383.0s ★                                                                                                         
+[CNN] Epoch 003/50  loss=0.517689  val_f1=0.4147  time=377.6s ★                                                                                                         
+[CNN] Epoch 004/50  loss=0.473329  val_f1=0.4536  time=380.8s ★                                                                                                         
+[CNN] Epoch 005/50  loss=0.435788  val_f1=0.4682  time=379.0s ★                                                                                                         
+[CNN] Epoch 006/50  loss=0.404235  val_f1=0.5002  time=376.1s ★                                                                                                         
+[CNN] Epoch 007/50  loss=0.380964  val_f1=0.4959  time=378.9s                                                                                                           
+[CNN] Epoch 008/50  loss=0.368304  val_f1=0.5343  time=375.1s ★                                                                                                         
+[CNN] Epoch 009/50  loss=0.344118  val_f1=0.5288  time=379.5s                                                                                                           
+[CNN] Epoch 010/50  loss=0.326405  val_f1=0.5333  time=376.7s                                                                                                           
+[CNN] Epoch 011/50  loss=0.314877  val_f1=0.5662  time=377.8s ★                                                                                                         
+[CNN] Epoch 012/50  loss=0.308495  val_f1=0.5616  time=381.0s                                                                                                           
+[CNN] Epoch 013/50  loss=0.295409  val_f1=0.5789  time=374.5s ★                                                                                                         
+[CNN] Epoch 014/50  loss=0.283020  val_f1=0.5834  time=378.2s ★                                                                                                         
+[CNN] Epoch 015/50  loss=0.272640  val_f1=0.6043  time=379.0s ★                                                                                                         
+[CNN] Epoch 016/50  loss=0.266615  val_f1=0.6055  time=379.1s ★                                                                                                         
+[CNN] Epoch 017/50  loss=0.255129  val_f1=0.5909  time=375.5s                                                                                                           
+[CNN] Epoch 018/50  loss=0.253933  val_f1=0.6124  time=381.2s ★                                                                                                         
+[CNN] Epoch 019/50  loss=0.242179  val_f1=0.6001  time=378.0s                                                                                                           
+[CNN] Epoch 020/50  loss=0.235323  val_f1=0.6360  time=376.2s ★                                                                                                         
+[CNN] Epoch 021/50  loss=0.230519  val_f1=0.6277  time=379.5s                                                                                                           
+[CNN] Epoch 022/50  loss=0.223324  val_f1=0.6266  time=374.8s                                                                                                           
+[CNN] Epoch 023/50  loss=0.219732  val_f1=0.6270  time=378.3s                                                                                                           
+[CNN] Epoch 024/50  loss=0.220909  val_f1=0.6280  time=377.0s                                                                                                           
+[CNN] Epoch 025/50  loss=0.208401  val_f1=0.6398  time=380.3s ★                                                                                                         
+[CNN] Epoch 026/50  loss=0.205941  val_f1=0.6540  time=376.1s ★                                                                                                         
+[CNN] Epoch 027/50  loss=0.204441  val_f1=0.6359  time=376.5s                                                                                                           
+[CNN] Epoch 028/50  loss=0.201717  val_f1=0.6367  time=377.8s                                                                                                           
+[CNN] Epoch 029/50  loss=0.196518  val_f1=0.6445  time=381.0s                                                                                                           
+[CNN] Epoch 030/50  loss=0.194648  val_f1=0.6495  time=375.8s                                                                                                           
+[CNN] Epoch 031/50  loss=0.189059  val_f1=0.6422  time=378.5s                                                                                                           
+[CNN] Epoch 032/50  loss=0.189883  val_f1=0.6478  time=381.2s                                                                                                           
+[CNN] Epoch 033/50  loss=0.182401  val_f1=0.6579  time=382.4s ★                                                                                                         
+[CNN] Epoch 034/50  loss=0.184249  val_f1=0.6591  time=377.0s ★                                                                                                         
+[CNN] Epoch 035/50  loss=0.176893  val_f1=0.6539  time=377.7s                                                                                                           
+[CNN] Epoch 036/50  loss=0.175926  val_f1=0.6574  time=377.7s                                                                                                           
+[CNN] Epoch 037/50  loss=0.169535  val_f1=0.6629  time=379.8s ★                                                                                                         
+[CNN] Epoch 038/50  loss=0.174389  val_f1=0.6582  time=377.3s                                                                                                           
+[CNN] Epoch 039/50  loss=0.172339  val_f1=0.6597  time=379.5s                                                                                                           
+[CNN] Epoch 040/50  loss=0.169886  val_f1=0.6600  time=376.9s                                                                                                           
+[CNN] Epoch 041/50  loss=0.175423  val_f1=0.6570  time=380.2s                                                                                                           
+[CNN] Epoch 042/50  loss=0.171255  val_f1=0.6653  time=381.6s ★                                                                                                         
+[CNN] Epoch 043/50  loss=0.168714  val_f1=0.6628  time=379.4s                                                                                                           
+[CNN] Epoch 044/50  loss=0.170047  val_f1=0.6638  time=375.9s                                                                                                           
+[CNN] Epoch 045/50  loss=0.168559  val_f1=0.6647  time=377.4s                                                                                                           
+[CNN] Epoch 046/50  loss=0.171055  val_f1=0.6652  time=377.9s                                                                                                           
+[CNN] Epoch 047/50  loss=0.167125  val_f1=0.6635  time=377.0s                                                                                                           
+[CNN] Epoch 048/50  loss=0.169865  val_f1=0.6635  time=378.6s                                                                                                           
+[CNN] Epoch 049/50  loss=0.169719  val_f1=0.6634  time=379.9s                                                                                                           
+[CNN] Epoch 050/50  loss=0.166067  val_f1=0.6636  time=379.0s                                                                                                           
+
+Restored best checkpoint  (epoch 42,  val F1=0.6653)
+Training curves saved → EXPERIMENTS/CNN_V1/training_curves.png
+
+--- Threshold Optimisation (val set) ---
+Code  Name                          Threshold
+---------------------------------------------
+ C0  Normal                             0.55
+ C1  AMD                                0.55
+ DR  DR                                 0.50
+ C6  Glaucoma                           0.80
+ C7  Hypertensive_Retinopathy           0.90
+ C8  Pathological_Myopia                0.25
+ C9  Tessellated_Fundus                 0.10
+C10  Vitreous_Degeneration              0.70
+C11  BRVO                               0.30
+C13  Large_Optic_Cup                    0.75
+C14  Drusen                             0.90
+C15  Epiretinal_Membrane                0.90
+C18  Optic_Disc_Edema                   0.90
+C19  Myelinated_Nerve_Fibers            0.45
+C22  Retinal_Detachment                 0.40
+C25  Refractive_Media_Opacity           0.30
+C27  CSC                                0.85
+C29  Laser_Spots                        0.85
+C32  CRVO                               0.30
+
+=======================================================
+  EVALUATION — TEST SET
+=======================================================
+
+Per-class results
+Code  Name                            Thr       P       R      F1      S
+------------------------------------------------------------------------
+ C0  Normal                         0.55  0.6302  0.8869  0.7368    442
+ C1  AMD                            0.55  0.5745  0.6923  0.6279     39
+ DR  DR                             0.50  0.5531  0.7444  0.6346    266
+ C6  Glaucoma                       0.80  0.3117  0.8276  0.4528     29
+ C7  Hypertensive_Retinopathy       0.90  0.2571  0.3600  0.3000     25
+ C8  Pathological_Myopia            0.25  0.7848  0.9118  0.8435     68
+ C9  Tessellated_Fundus             0.10  0.5362  0.9024  0.6727     41
+C10  Vitreous_Degeneration          0.70  0.6923  0.8182  0.7500     11
+C11  BRVO                           0.30  0.8000  0.8000  0.8000     35
+C13  Large_Optic_Cup                0.75  0.7069  0.6406  0.6721     64
+C14  Drusen                         0.90  0.6056  0.5584  0.5811     77
+C15  Epiretinal_Membrane            0.90  0.5063  0.6667  0.5755     60
+C18  Optic_Disc_Edema               0.90  0.8000  0.8571  0.8276     14
+C19  Myelinated_Nerve_Fibers        0.45  0.3571  0.5556  0.4348      9
+C22  Retinal_Detachment             0.40  0.8000  0.8889  0.8421      9
+C25  Refractive_Media_Opacity       0.30  0.8107  0.8354  0.8228    164
+C27  CSC                            0.85  0.7500  0.8182  0.7826     11
+C29  Laser_Spots                    0.85  0.6667  0.5333  0.5926     15
+C32  CRVO                           0.30  0.7778  0.7778  0.7778      9
+------------------------------------------------------------------------
+
+Macro  P=0.6274  R=0.7408  F1=0.6699
+Metrics saved  → EXPERIMENTS/CNN_V1/cnn_evaluation.txt
+Confusion matrices saved → EXPERIMENTS/CNN_V1/confusion_matrices.png
+
+All outputs written to: EXPERIMENTS/CNN_V1/

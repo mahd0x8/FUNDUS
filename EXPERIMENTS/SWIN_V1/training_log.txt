@@ -1,0 +1,48 @@
+Device     : NVIDIA GeForce RTX 3060
+Split      : train=5886  val=1261  test=1262
+Parameters : 195.8M  (Swin-Large backbone + head)
+
+============================================================
+  SWIN-LARGE TRAINING  (100 epochs, warmup=5)
+  Backbone LR : 2e-05   Head LR : 0.0001
+  Batch size  : 16   Dropout : 0.3
+  Weight decay: 0.01  Grad clip: 1.0
+============================================================
+
+[Swin] Epoch 001/100  loss=0.898113  val_f1=0.1521  bb_lr=5.60e-06  head_lr=2.80e-05  time=410.4s ★
+[Swin] Epoch 002/100  loss=0.679424  val_f1=0.3788  bb_lr=9.20e-06  head_lr=4.60e-05  time=419.6s ★
+[Swin] Epoch 003/100  loss=0.501272  val_f1=0.4466  bb_lr=1.28e-05  head_lr=6.40e-05  time=430.9s ★
+[Swin] Epoch 004/100  loss=0.419079  val_f1=0.5710  bb_lr=1.64e-05  head_lr=8.20e-05  time=428.2s ★
+[Swin] Epoch 005/100  loss=0.352044  val_f1=0.6207  bb_lr=2.00e-05  head_lr=1.00e-04  time=434.4s ★
+[Swin] Epoch 006/100  loss=0.315132  val_f1=0.6574  bb_lr=2.00e-05  head_lr=1.00e-04  time=403.9s ★
+[Swin] Epoch 007/100  loss=0.272361  val_f1=0.6693  bb_lr=2.00e-05  head_lr=9.99e-05  time=444.5s ★
+[Swin] Epoch 008/100  loss=0.245135  val_f1=0.6708  bb_lr=2.00e-05  head_lr=9.98e-05  time=400.1s ★
+[Swin] Epoch 009/100  loss=0.221288  val_f1=0.6958  bb_lr=1.99e-05  head_lr=9.96e-05  time=412.3s ★
+[Swin] Epoch 010/100  loss=0.202454  val_f1=0.6978  bb_lr=1.99e-05  head_lr=9.93e-05  time=419.4s ★
+[Swin] Epoch 011/100  loss=0.184119  val_f1=0.6927  bb_lr=1.98e-05  head_lr=9.90e-05  time=402.5s
+[Swin] Epoch 012/100  loss=0.167141  val_f1=0.7312  bb_lr=1.97e-05  head_lr=9.87e-05  time=371.0s ★
+[Swin] Epoch 013/100  loss=0.152499  val_f1=0.7386  bb_lr=1.97e-05  head_lr=9.83e-05  time=371.8s ★
+[Swin] Epoch 014/100  loss=0.145268  val_f1=0.7098  bb_lr=1.96e-05  head_lr=9.78e-05  time=371.4s
+[Swin] Epoch 015/100  loss=0.136200  val_f1=0.7445  bb_lr=1.95e-05  head_lr=9.73e-05  time=376.1s ★
+[Swin] Epoch 016/100  loss=0.118082  val_f1=0.7452  bb_lr=1.93e-05  head_lr=9.67e-05  time=374.5s ★
+[Swin] Epoch 017/100  loss=0.105440  val_f1=0.7501  bb_lr=1.92e-05  head_lr=9.61e-05  time=373.2s ★
+[Swin] Epoch 018/100  loss=0.099870  val_f1=0.7414  bb_lr=1.91e-05  head_lr=9.55e-05  time=373.8s
+[Swin] Epoch 019/100  loss=0.092857  val_f1=0.7453  bb_lr=1.90e-05  head_lr=9.47e-05  time=367.3s
+[Swin] Epoch 020/100  loss=0.084123  val_f1=0.7619  bb_lr=1.88e-05  head_lr=9.40e-05  time=382.0s ★
+[Swin] Epoch 021/100  loss=0.080830  val_f1=0.7666  bb_lr=1.86e-05  head_lr=9.32e-05  time=374.9s ★
+[Swin] Epoch 022/100  loss=0.068522  val_f1=0.7442  bb_lr=1.85e-05  head_lr=9.23e-05  time=383.0s
+[Swin] Epoch 023/100  loss=0.062666  val_f1=0.7637  bb_lr=1.83e-05  head_lr=9.14e-05  time=374.4s
+[Swin] Epoch 024/100  loss=0.065245  val_f1=0.7523  bb_lr=1.81e-05  head_lr=9.05e-05  time=370.8s
+[Swin] Epoch 025/100  loss=0.058041  val_f1=0.7581  bb_lr=1.79e-05  head_lr=8.95e-05  time=372.7s
+[Swin] Epoch 026/100  loss=0.053761  val_f1=0.7612  bb_lr=1.77e-05  head_lr=8.84e-05  time=376.1s
+[Swin] Epoch 027/100  loss=0.046843  val_f1=0.7609  bb_lr=1.75e-05  head_lr=8.74e-05  time=385.9s
+[Swin] Epoch 028/100  loss=0.051657  val_f1=0.7539  bb_lr=1.73e-05  head_lr=8.62e-05  time=382.7s
+[Swin] Epoch 029/100  loss=0.046848  val_f1=0.7777  bb_lr=1.70e-05  head_lr=8.51e-05  time=388.8s ★
+[Swin] Epoch 030/100  loss=0.037935  val_f1=0.7619  bb_lr=1.68e-05  head_lr=8.39e-05  time=420.5s
+[Swin] Epoch 031/100  loss=0.034846  val_f1=0.7685  bb_lr=1.65e-05  head_lr=8.26e-05  time=381.1s
+[Swin] Epoch 032/100  loss=0.031022  val_f1=0.7563  bb_lr=1.63e-05  head_lr=8.14e-05  time=371.9s
+[Swin] Epoch 033/100  loss=0.029462  val_f1=0.7439  bb_lr=1.60e-05  head_lr=8.01e-05  time=380.4s
+[Swin] Epoch 034/100  loss=0.034761  val_f1=0.7416  bb_lr=1.58e-05  head_lr=7.87e-05  time=397.0s
+[Swin] Epoch 035/100  loss=0.035309  val_f1=0.7650  bb_lr=1.55e-05  head_lr=7.74e-05  time=376.7s
+[Swin] Epoch 036/100  loss=0.022991  val_f1=0.7606  bb_lr=1.52e-05  head_lr=7.60e-05  time=434.1s
+[Swin] Epoch 037/100  loss=0.026770  val_f1=0.7521  bb_lr=1.49e-05  head_lr=7.45e-05  time=397.2s
