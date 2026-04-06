@@ -75,6 +75,32 @@ All models evaluated on the same held-out test set (n=1,262) across 19 disease c
 3. **Data preparation:**
    Expects a master CSV (`DATASET/filtered_data_split.csv`) defining splits (`train`, `val`, `test`), image paths, and multi-hot labels for the 19 classes.
 
+### Docker (recommended for deployment)
+
+The application runs as two containers — a FastAPI inference backend and a React frontend served by nginx — orchestrated via Docker Compose.
+
+**Prerequisites:** Docker and Docker Compose installed on the host.
+
+**1. Ensure the model checkpoint exists:**
+```bash
+# The compose file mounts this path read-only into the API container
+ls EXPERIMENTS/V1/best_classifier.pt
+```
+
+**2. Build and start all services:**
+```bash
+docker compose up --build
+```
+
+The frontend will be available at `http://localhost:3000`. The API proxies through nginx at `/api` — no separate port is needed.
+
+**3. Stop all services:**
+```bash
+docker compose down
+```
+
+**GPU support:** The API container runs on CPU by default. To enable GPU, uncomment the `deploy` block in `docker-compose.yml`, set `DEVICE: cuda`, and ensure the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) is installed on the host.
+
 ## Usage
 
 **Run CNN Pipeline (ConvNeXt-Base):**
