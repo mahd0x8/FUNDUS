@@ -46,3 +46,4 @@ Parameters : 195.8M  (Swin-Large backbone + head)
 [Swin] Epoch 035/100  loss=0.035309  val_f1=0.7650  bb_lr=1.55e-05  head_lr=7.74e-05  time=376.7s
 [Swin] Epoch 036/100  loss=0.022991  val_f1=0.7606  bb_lr=1.52e-05  head_lr=7.60e-05  time=434.1s
 [Swin] Epoch 037/100  loss=0.026770  val_f1=0.7521  bb_lr=1.49e-05  head_lr=7.45e-05  time=397.2s
+[Swin] Epoch 038/100  loss=0.028965  val_f1=0.7428  bb_lr=1.46e-05  head_lr=7.31e-05  time=392.1s

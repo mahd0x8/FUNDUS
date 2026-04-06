@@ -1,0 +1,76 @@
+Loaded rows: 9693
+
+=== Original class counts ===
+ C0 (Normal                   ) : 2909
+ C1 (AMD                      ) : 280
+ C2 (Mild_DR                  ) : 536
+ C3 (Moderate_DR              ) : 985
+ C4 (Severe_DR                ) : 157
+ C5 (Proliferative_DR         ) : 68
+ C6 (Glaucoma                 ) : 257
+ C7 (Hypertensive_Retinopathy ) : 187
+ C8 (Pathological_Myopia      ) : 458
+ C9 (Tessellated_Fundus       ) : 265
+C10 (Vitreous_Degeneration    ) : 100
+C11 (BRVO                     ) : 185
+C12 (CRAO                     ) : 14
+C13 (Large_Optic_Cup          ) : 423
+C14 (Drusen                   ) : 526
+C15 (Epiretinal_Membrane      ) : 418
+C16 (Macular_Hole             ) : 19
+C17 (Retinitis_Pigmentosa     ) : 10
+C18 (Optic_Disc_Edema         ) : 111
+C19 (Myelinated_Nerve_Fibers  ) : 105
+C20 (Laser_Scars              ) : 8
+C21 (Silicone_Oil             ) : 14
+C22 (Retinal_Detachment       ) : 57
+C23 (Macular_Edema            ) : 40
+C24 (CNV                      ) : 19
+C25 (Refractive_Media_Opacity ) : 942
+C26 (AION                     ) : 45
+C27 (CSC                      ) : 75
+C28 (Macular_Scar             ) : 8
+C29 (Laser_Spots              ) : 82
+C30 (RPE_Changes              ) : 19
+C31 (Macular_Atrophy          ) : 25
+C32 (CRVO                     ) : 67
+C33 (Branch_Artery_Occlusion  ) : 33
+C34 (Optic_Disc_Pallor        ) : 15
+C35 (Tilted_Optic_Disc        ) : 34
+C36 (Posterior_Staphyloma     ) : 29
+C37 (Chorioretinal_Atrophy    ) : 18
+C38 (Other                    ) : 22
+
+=== DR merge summary ===
+ C2 (Mild_DR                  ) : 536
+ C3 (Moderate_DR              ) : 985
+ C4 (Severe_DR                ) : 157
+ C5 (Proliferative_DR         ) : 68
+ DR (Merged_DR                ) : 1746
+
+=== Final retained class counts ===
+ C0 (Normal                   ) : 2909
+ C1 (AMD                      ) : 280
+ DR (DR                       ) : 1746
+ C6 (Glaucoma                 ) : 257
+ C7 (Hypertensive_Retinopathy ) : 187
+ C8 (Pathological_Myopia      ) : 458
+ C9 (Tessellated_Fundus       ) : 265
+C10 (Vitreous_Degeneration    ) : 100
+C11 (BRVO                     ) : 185
+C13 (Large_Optic_Cup          ) : 423
+C14 (Drusen                   ) : 526
+C15 (Epiretinal_Membrane      ) : 418
+C18 (Optic_Disc_Edema         ) : 111
+C19 (Myelinated_Nerve_Fibers  ) : 105
+C22 (Retinal_Detachment       ) : 57
+C25 (Refractive_Media_Opacity ) : 942
+C27 (CSC                      ) : 75
+C29 (Laser_Spots              ) : 82
+C32 (CRVO                     ) : 67
+
+Total original rows : 9693
+Total filtered rows : 8409
+Dropped rows        : 1284
+
+Saved filtered file to: DATASET/filtered_data_merged_V1.csv
