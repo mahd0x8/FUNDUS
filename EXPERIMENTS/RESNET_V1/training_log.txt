@@ -1,0 +1,43 @@
+Device     : NVIDIA GeForce RTX 3060
+Split      : train=5886  val=1261  test=1262
+Parameters : 24.6M  (ResNet-50 backbone + head)
+
+============================================================
+  RESNET-50 TRAINING  (50 epochs)
+  Backbone LR : 1e-05   Head LR : 0.0001
+  Batch size  : 64   Dropout : 0.3
+  Weight decay: 0.0001
+============================================================
+
+[ResNet] Epoch 001/50  loss=0.894524  val_f1=0.1858  bb_lr=9.99e-06  head_lr=9.99e-05  time=430.7s ★
+[ResNet] Epoch 002/50  loss=0.729516  val_f1=0.2341  bb_lr=9.96e-06  head_lr=9.96e-05  time=502.1s ★
+[ResNet] Epoch 003/50  loss=0.624023  val_f1=0.3332  bb_lr=9.91e-06  head_lr=9.91e-05  time=474.6s ★
+[ResNet] Epoch 004/50  loss=0.558190  val_f1=0.3735  bb_lr=9.84e-06  head_lr=9.84e-05  time=501.2s ★
+[ResNet] Epoch 005/50  loss=0.510225  val_f1=0.4035  bb_lr=9.76e-06  head_lr=9.76e-05  time=461.8s ★
+[ResNet] Epoch 006/50  loss=0.473972  val_f1=0.4063  bb_lr=9.65e-06  head_lr=9.65e-05  time=464.7s ★
+[ResNet] Epoch 007/50  loss=0.443057  val_f1=0.4326  bb_lr=9.53e-06  head_lr=9.52e-05  time=431.8s ★
+[ResNet] Epoch 008/50  loss=0.422277  val_f1=0.4153  bb_lr=9.39e-06  head_lr=9.38e-05  time=432.5s
+[ResNet] Epoch 009/50  loss=0.403969  val_f1=0.4469  bb_lr=9.23e-06  head_lr=9.22e-05  time=432.7s ★
+[ResNet] Epoch 010/50  loss=0.389117  val_f1=0.4624  bb_lr=9.05e-06  head_lr=9.05e-05  time=402.6s ★
+[ResNet] Epoch 011/50  loss=0.376521  val_f1=0.4751  bb_lr=8.86e-06  head_lr=8.85e-05  time=406.7s ★
+[ResNet] Epoch 012/50  loss=0.361328  val_f1=0.4715  bb_lr=8.66e-06  head_lr=8.65e-05  time=396.3s
+[ResNet] Epoch 013/50  loss=0.350801  val_f1=0.4887  bb_lr=8.44e-06  head_lr=8.42e-05  time=397.5s ★
+[ResNet] Epoch 014/50  loss=0.340384  val_f1=0.4885  bb_lr=8.21e-06  head_lr=8.19e-05  time=389.4s
+[ResNet] Epoch 015/50  loss=0.337057  val_f1=0.4783  bb_lr=7.96e-06  head_lr=7.94e-05  time=389.7s
+[ResNet] Epoch 016/50  loss=0.318251  val_f1=0.5112  bb_lr=7.70e-06  head_lr=7.68e-05  time=407.0s ★
+[ResNet] Epoch 017/50  loss=0.313288  val_f1=0.5037  bb_lr=7.43e-06  head_lr=7.41e-05  time=411.3s
+[ResNet] Epoch 018/50  loss=0.304705  val_f1=0.5169  bb_lr=7.16e-06  head_lr=7.13e-05  time=446.3s ★
+[ResNet] Epoch 019/50  loss=0.299031  val_f1=0.5145  bb_lr=6.87e-06  head_lr=6.84e-05  time=426.8s
+[ResNet] Epoch 020/50  loss=0.295672  val_f1=0.5217  bb_lr=6.58e-06  head_lr=6.55e-05  time=395.2s ★
+[ResNet] Epoch 021/50  loss=0.284596  val_f1=0.5446  bb_lr=6.28e-06  head_lr=6.25e-05  time=390.0s ★
+[ResNet] Epoch 022/50  loss=0.280143  val_f1=0.5300  bb_lr=5.98e-06  head_lr=5.94e-05  time=393.4s
+[ResNet] Epoch 023/50  loss=0.269499  val_f1=0.5509  bb_lr=5.67e-06  head_lr=5.63e-05  time=418.1s ★
+[ResNet] Epoch 024/50  loss=0.268239  val_f1=0.5393  bb_lr=5.36e-06  head_lr=5.32e-05  time=395.2s
+[ResNet] Epoch 025/50  loss=0.263468  val_f1=0.5419  bb_lr=5.05e-06  head_lr=5.00e-05  time=413.3s
+[ResNet] Epoch 026/50  loss=0.259678  val_f1=0.5357  bb_lr=4.74e-06  head_lr=4.69e-05  time=431.2s
+[ResNet] Epoch 027/50  loss=0.249071  val_f1=0.5492  bb_lr=4.43e-06  head_lr=4.38e-05  time=441.3s
+[ResNet] Epoch 028/50  loss=0.253674  val_f1=0.5463  bb_lr=4.12e-06  head_lr=4.07e-05  time=449.6s
+[ResNet] Epoch 029/50  loss=0.244310  val_f1=0.5539  bb_lr=3.82e-06  head_lr=3.76e-05  time=463.0s ★
+[ResNet] Epoch 030/50  loss=0.242698  val_f1=0.5617  bb_lr=3.52e-06  head_lr=3.46e-05  time=434.4s ★
+[ResNet] Epoch 031/50  loss=0.240289  val_f1=0.5506  bb_lr=3.23e-06  head_lr=3.17e-05  time=396.4s
+[ResNet] Epoch 032/50  loss=0.238758  val_f1=0.5640  bb_lr=2.94e-06  head_lr=2.88e-05  time=398.2s ★

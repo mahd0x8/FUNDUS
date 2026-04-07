@@ -534,7 +534,7 @@ if __name__ == "__main__":
         split_col    = "split",
         image_size   = 224,
         epochs       = 50,
-        batch_size   = 32,
+        batch_size   = 64,
         lr_head      = 1e-4,
         lr_backbone  = 1e-5,
         weight_decay = 1e-4,

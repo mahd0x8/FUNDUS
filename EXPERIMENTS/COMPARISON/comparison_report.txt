@@ -1,0 +1,108 @@
+========================================================================
+  FUNDUS MODEL COMPARISON REPORT
+========================================================================
+
+── 1. OVERALL MACRO RANKING (test set, n=1,262) ─────────────────────────
+  Rank  Model                Macro P   Macro R   Macro F1  Architecture
+  --------------------------------------------------------------------------------
+  1     SWIN_V1               0.7721    0.7510     0.7538  Swin-Large
+  2     V1 (SupCon)           0.7495    0.6807     0.7057  ResNeXt50 + SupCon
+  3     CNN_V1                0.6274    0.7408     0.6699  ConvNeXt-Base
+
+  ★  Best model overall: SWIN_V1  (Macro F1 = 0.7538)
+
+── 2. ARCHITECTURE DETAILS ──────────────────────────────────────────────
+  SWIN_V1
+    • Swin-Large
+    • 195.8M params
+    • 100 epochs
+    • ImageNet-22k pretrained
+
+  V1 (SupCon)
+    • ResNeXt50 + SupCon
+    • ~25M params
+    • 3-stage (100+30+20 epochs)
+
+  CNN_V1
+    • ConvNeXt-Base
+    • ~87M params
+    • 50 epochs
+    • ImageNet-1k pretrained
+
+── 3. PER-CLASS F1 SCORES ───────────────────────────────────────────────
+  Code Disease                        SWIN_V1V1 (SupCon)    CNN_V1  Winner
+  ------------------------------------------------------------------------
+  C0   Normal                        0.7832 ★  0.7599    0.7368    SWIN_V1
+  C1   AMD                           0.6842 ★  0.5882    0.6279    SWIN_V1
+  DR   Diabetic Retinopathy          0.6694 ★  0.6542    0.6346    SWIN_V1
+  C6   Glaucoma                      0.6000    0.6102 ★  0.4528    V1 (SupCon)
+  C7   Hypertensive Retinopathy      0.3590 ★  0.3333    0.3000    SWIN_V1
+  C8   Pathological Myopia           0.8722 ★  0.8406    0.8435    SWIN_V1
+  C9   Tessellated Fundus            0.7527 ★  0.6591    0.6727    SWIN_V1
+  C10  Vitreous Degeneration         0.8696    0.9091 ★  0.7500    V1 (SupCon)
+  C11  BRVO                          0.8615 ★  0.8438    0.8000    SWIN_V1
+  C13  Large Optic Cup               0.7903 ★  0.7869    0.6721    SWIN_V1
+  C14  Drusen                        0.6115 ★  0.5793    0.5811    SWIN_V1
+  C15  Epiretinal Membrane           0.6935 ★  0.5979    0.5755    SWIN_V1
+  C18  Optic Disc Edema              0.8125    0.8485 ★  0.8276    V1 (SupCon)
+  C19  Myelinated Nerve Fibers       0.6667 ★  0.5556    0.4348    SWIN_V1
+  C22  Retinal Detachment            1.0000 ★  0.8750    0.8421    SWIN_V1
+  C25  Refractive Media Opacity      0.8375    0.8411 ★  0.8228    V1 (SupCon)
+  C27  CSC                           0.9091 ★  0.7500    0.7826    SWIN_V1
+  C29  Laser Spots                   0.6087 ★  0.5000    0.5926    SWIN_V1
+  C32  CRVO                          0.9412 ★  0.8750    0.7778    SWIN_V1
+
+── 4. CLASS-LEVEL WIN COUNT ─────────────────────────────────────────────
+  SWIN_V1             wins on 15/19 classes
+  V1 (SupCon)         wins on 4/19 classes
+  CNN_V1              wins on 0/19 classes
+
+── 5. SWIN_V1 vs V1 (SupCon) — LARGEST F1 GAPS ──────────────────────────
+  Code Disease                         SWIN_V1    V1 (SupCon)      Δ F1
+  ------------------------------------------------------------------------
+  C27  CSC                              0.9091         0.7500  + 0.1591
+  C22  Retinal Detachment               1.0000         0.8750  + 0.1250
+  C19  Myelinated Nerve Fibers          0.6667         0.5556  + 0.1111
+  C29  Laser Spots                      0.6087         0.5000  + 0.1087
+  C1   AMD                              0.6842         0.5882  + 0.0960
+  C15  Epiretinal Membrane              0.6935         0.5979  + 0.0956
+  C9   Tessellated Fundus               0.7527         0.6591  + 0.0936
+  C32  CRVO                             0.9412         0.8750  + 0.0662
+  C10  Vitreous Degeneration            0.8696         0.9091  -0.0395
+  C18  Optic Disc Edema                 0.8125         0.8485  -0.0360
+  C14  Drusen                           0.6115         0.5793  + 0.0322
+  C8   Pathological Myopia              0.8722         0.8406  + 0.0316
+  C7   Hypertensive Retinopathy         0.3590         0.3333  + 0.0257
+  C0   Normal                           0.7832         0.7599  + 0.0233
+  C11  BRVO                             0.8615         0.8438  + 0.0177
+  DR   Diabetic Retinopathy             0.6694         0.6542  + 0.0152
+  C6   Glaucoma                         0.6000         0.6102  -0.0102
+  C25  Refractive Media Opacity         0.8375         0.8411  -0.0036
+  C13  Large Optic Cup                  0.7903         0.7869  + 0.0034
+
+── 6. HARDEST CLASSES (lowest average F1 across all models) ─────────────
+  Code Disease                        Avg F1   Support
+  ------------------------------------------------------
+  C7   Hypertensive Retinopathy       0.3308        25
+  C19  Myelinated Nerve Fibers        0.5524         9
+  C6   Glaucoma                       0.5543        29
+  C29  Laser Spots                    0.5671        15
+  C14  Drusen                         0.5906        77
+  C15  Epiretinal Membrane            0.6223        60
+  C1   AMD                            0.6334        39
+  DR   Diabetic Retinopathy           0.6527       266
+  C9   Tessellated Fundus             0.6948        41
+  C13  Large Optic Cup                0.7498        64
+  C0   Normal                         0.7600       442
+  C27  CSC                            0.8139        11
+  C18  Optic Disc Edema               0.8295        14
+  C25  Refractive Media Opacity       0.8338       164
+  C11  BRVO                           0.8351        35
+  C10  Vitreous Degeneration          0.8429        11
+  C8   Pathological Myopia            0.8521        68
+  C32  CRVO                           0.8647         9
+  C22  Retinal Detachment             0.9057         9
+
+========================================================================
+  END OF REPORT
+========================================================================
