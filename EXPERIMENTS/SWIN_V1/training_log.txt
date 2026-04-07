@@ -47,3 +47,124 @@ Parameters : 195.8M  (Swin-Large backbone + head)
 [Swin] Epoch 036/100  loss=0.022991  val_f1=0.7606  bb_lr=1.52e-05  head_lr=7.60e-05  time=434.1s
 [Swin] Epoch 037/100  loss=0.026770  val_f1=0.7521  bb_lr=1.49e-05  head_lr=7.45e-05  time=397.2s
 [Swin] Epoch 038/100  loss=0.028965  val_f1=0.7428  bb_lr=1.46e-05  head_lr=7.31e-05  time=392.1s
+[Swin] Epoch 039/100  loss=0.027334  val_f1=0.7416  bb_lr=1.43e-05  head_lr=7.16e-05  time=389.6s
+[Swin] Epoch 040/100  loss=0.016723  val_f1=0.7565  bb_lr=1.40e-05  head_lr=7.01e-05  time=373.0s
+[Swin] Epoch 041/100  loss=0.020027  val_f1=0.7577  bb_lr=1.37e-05  head_lr=6.86e-05  time=371.7s
+[Swin] Epoch 042/100  loss=0.018103  val_f1=0.7729  bb_lr=1.34e-05  head_lr=6.70e-05  time=373.4s
+[Swin] Epoch 043/100  loss=0.016235  val_f1=0.7596  bb_lr=1.31e-05  head_lr=6.55e-05  time=370.1s
+[Swin] Epoch 044/100  loss=0.019499  val_f1=0.7586  bb_lr=1.28e-05  head_lr=6.39e-05  time=371.8s
+[Swin] Epoch 045/100  loss=0.021261  val_f1=0.7599  bb_lr=1.25e-05  head_lr=6.23e-05  time=366.3s
+[Swin] Epoch 046/100  loss=0.015136  val_f1=0.7525  bb_lr=1.22e-05  head_lr=6.07e-05  time=372.6s
+[Swin] Epoch 047/100  loss=0.015872  val_f1=0.7629  bb_lr=1.18e-05  head_lr=5.91e-05  time=371.6s
+[Swin] Epoch 048/100  loss=0.012246  val_f1=0.7593  bb_lr=1.15e-05  head_lr=5.75e-05  time=370.9s
+[Swin] Epoch 049/100  loss=0.011779  val_f1=0.7601  bb_lr=1.12e-05  head_lr=5.58e-05  time=372.5s
+[Swin] Epoch 050/100  loss=0.014175  val_f1=0.7517  bb_lr=1.09e-05  head_lr=5.42e-05  time=368.0s
+[Swin] Epoch 051/100  loss=0.012267  val_f1=0.7611  bb_lr=1.05e-05  head_lr=5.25e-05  time=367.1s
+[Swin] Epoch 052/100  loss=0.014977  val_f1=0.7710  bb_lr=1.02e-05  head_lr=5.09e-05  time=371.6s
+[Swin] Epoch 053/100  loss=0.009841  val_f1=0.7569  bb_lr=9.89e-06  head_lr=4.92e-05  time=369.7s
+[Swin] Epoch 054/100  loss=0.010891  val_f1=0.7647  bb_lr=9.56e-06  head_lr=4.76e-05  time=371.9s
+[Swin] Epoch 055/100  loss=0.010558  val_f1=0.7620  bb_lr=9.23e-06  head_lr=4.59e-05  time=371.0s
+[Swin] Epoch 056/100  loss=0.009907  val_f1=0.7603  bb_lr=8.90e-06  head_lr=4.43e-05  time=370.5s
+[Swin] Epoch 057/100  loss=0.009963  val_f1=0.7574  bb_lr=8.57e-06  head_lr=4.26e-05  time=372.0s
+[Swin] Epoch 058/100  loss=0.008289  val_f1=0.7424  bb_lr=8.25e-06  head_lr=4.10e-05  time=371.1s
+[Swin] Epoch 059/100  loss=0.009097  val_f1=0.7569  bb_lr=7.93e-06  head_lr=3.94e-05  time=372.6s
+[Swin] Epoch 060/100  loss=0.006900  val_f1=0.7671  bb_lr=7.61e-06  head_lr=3.78e-05  time=368.9s
+[Swin] Epoch 061/100  loss=0.008834  val_f1=0.7527  bb_lr=7.29e-06  head_lr=3.62e-05  time=372.6s
+[Swin] Epoch 062/100  loss=0.008539  val_f1=0.7670  bb_lr=6.98e-06  head_lr=3.46e-05  time=374.6s
+[Swin] Epoch 063/100  loss=0.005343  val_f1=0.7632  bb_lr=6.66e-06  head_lr=3.31e-05  time=369.6s
+[Swin] Epoch 064/100  loss=0.005675  val_f1=0.7559  bb_lr=6.36e-06  head_lr=3.15e-05  time=370.1s
+[Swin] Epoch 065/100  loss=0.006361  val_f1=0.7523  bb_lr=6.05e-06  head_lr=3.00e-05  time=369.7s
+[Swin] Epoch 066/100  loss=0.007324  val_f1=0.7610  bb_lr=5.75e-06  head_lr=2.85e-05  time=371.2s
+[Swin] Epoch 067/100  loss=0.004449  val_f1=0.7568  bb_lr=5.46e-06  head_lr=2.70e-05  time=370.1s
+[Swin] Epoch 068/100  loss=0.003863  val_f1=0.7595  bb_lr=5.17e-06  head_lr=2.56e-05  time=364.7s
+[Swin] Epoch 069/100  loss=0.004717  val_f1=0.7581  bb_lr=4.89e-06  head_lr=2.41e-05  time=373.1s
+[Swin] Epoch 070/100  loss=0.005313  val_f1=0.7656  bb_lr=4.61e-06  head_lr=2.27e-05  time=367.7s
+[Swin] Epoch 071/100  loss=0.004385  val_f1=0.7630  bb_lr=4.34e-06  head_lr=2.14e-05  time=372.1s
+[Swin] Epoch 072/100  loss=0.003137  val_f1=0.7779  bb_lr=4.07e-06  head_lr=2.00e-05  time=370.4s ★
+[Swin] Epoch 073/100  loss=0.003697  val_f1=0.7738  bb_lr=3.81e-06  head_lr=1.87e-05  time=366.9s
+[Swin] Epoch 074/100  loss=0.002866  val_f1=0.7684  bb_lr=3.56e-06  head_lr=1.75e-05  time=369.6s
+[Swin] Epoch 075/100  loss=0.004994  val_f1=0.7668  bb_lr=3.31e-06  head_lr=1.62e-05  time=370.8s
+[Swin] Epoch 076/100  loss=0.003984  val_f1=0.7644  bb_lr=3.07e-06  head_lr=1.50e-05  time=368.8s
+[Swin] Epoch 077/100  loss=0.001655  val_f1=0.7610  bb_lr=2.84e-06  head_lr=1.39e-05  time=371.6s
+[Swin] Epoch 078/100  loss=0.002074  val_f1=0.7657  bb_lr=2.62e-06  head_lr=1.27e-05  time=369.4s
+[Swin] Epoch 079/100  loss=0.001993  val_f1=0.7658  bb_lr=2.40e-06  head_lr=1.17e-05  time=370.7s
+[Swin] Epoch 080/100  loss=0.002106  val_f1=0.7673  bb_lr=2.20e-06  head_lr=1.06e-05  time=369.2s
+[Swin] Epoch 081/100  loss=0.002960  val_f1=0.7623  bb_lr=2.00e-06  head_lr=9.64e-06  time=370.7s
+[Swin] Epoch 082/100  loss=0.000939  val_f1=0.7618  bb_lr=1.81e-06  head_lr=8.69e-06  time=367.5s
+[Swin] Epoch 083/100  loss=0.001275  val_f1=0.7624  bb_lr=1.63e-06  head_lr=7.79e-06  time=365.8s
+[Swin] Epoch 084/100  loss=0.002371  val_f1=0.7528  bb_lr=1.46e-06  head_lr=6.93e-06  time=372.1s
+[Swin] Epoch 085/100  loss=0.002273  val_f1=0.7621  bb_lr=1.30e-06  head_lr=6.12e-06  time=371.0s
+[Swin] Epoch 086/100  loss=0.003441  val_f1=0.7591  bb_lr=1.15e-06  head_lr=5.36e-06  time=370.4s
+[Swin] Epoch 087/100  loss=0.003726  val_f1=0.7653  bb_lr=1.01e-06  head_lr=4.65e-06  time=366.5s
+[Swin] Epoch 088/100  loss=0.002156  val_f1=0.7625  bb_lr=8.73e-07  head_lr=3.98e-06  time=371.7s
+[Swin] Epoch 089/100  loss=0.001361  val_f1=0.7591  bb_lr=7.51e-07  head_lr=3.37e-06  time=372.0s
+[Swin] Epoch 090/100  loss=0.000876  val_f1=0.7621  bb_lr=6.39e-07  head_lr=2.81e-06  time=370.7s
+[Swin] Epoch 091/100  loss=0.000982  val_f1=0.7615  bb_lr=5.37e-07  head_lr=2.30e-06  time=372.6s
+[Swin] Epoch 092/100  loss=0.001556  val_f1=0.7670  bb_lr=4.46e-07  head_lr=1.84e-06  time=368.4s
+[Swin] Epoch 093/100  loss=0.001103  val_f1=0.7671  bb_lr=3.65e-07  head_lr=1.43e-06  time=371.5s
+[Swin] Epoch 094/100  loss=0.001240  val_f1=0.7646  bb_lr=2.95e-07  head_lr=1.08e-06  time=371.9s
+[Swin] Epoch 095/100  loss=0.001172  val_f1=0.7634  bb_lr=2.36e-07  head_lr=7.81e-07  time=371.5s
+[Swin] Epoch 096/100  loss=0.001268  val_f1=0.7657  bb_lr=1.87e-07  head_lr=5.36e-07  time=372.1s
+[Swin] Epoch 097/100  loss=0.002338  val_f1=0.7646  bb_lr=1.49e-07  head_lr=3.46e-07  time=379.0s
+[Swin] Epoch 098/100  loss=0.001073  val_f1=0.7656  bb_lr=1.22e-07  head_lr=2.09e-07  time=373.5s
+[Swin] Epoch 099/100  loss=0.000973  val_f1=0.7678  bb_lr=1.05e-07  head_lr=1.27e-07  time=384.4s
+[Swin] Epoch 100/100  loss=0.000838  val_f1=0.7660  bb_lr=1.00e-07  head_lr=1.00e-07  time=382.1s
+
+Restored best checkpoint (epoch 72,  val F1=0.7779)
+Training curves saved → EXPERIMENTS/SWIN_V1/training_curves.png
+
+--- Threshold Optimisation (val set) ---
+Code  Name                          Threshold
+---------------------------------------------
+ C0  Normal                             0.10
+ C1  AMD                                0.55
+ DR  DR                                 0.45
+ C6  Glaucoma                           0.40
+ C7  Hypertensive_Retinopathy           0.20
+ C8  Pathological_Myopia                0.80
+ C9  Tessellated_Fundus                 0.15
+C10  Vitreous_Degeneration              0.10
+C11  BRVO                               0.60
+C13  Large_Optic_Cup                    0.90
+C14  Drusen                             0.35
+C15  Epiretinal_Membrane                0.10
+C18  Optic_Disc_Edema                   0.20
+C19  Myelinated_Nerve_Fibers            0.20
+C22  Retinal_Detachment                 0.10
+C25  Refractive_Media_Opacity           0.25
+C27  CSC                                0.45
+C29  Laser_Spots                        0.40
+C32  CRVO                               0.10
+
+============================================================
+  EVALUATION — TEST SET
+============================================================
+Per-class results
+Code  Name                            Thr       P       R      F1      S
+------------------------------------------------------------------------
+ C0  Normal                         0.10  0.7013  0.8869  0.7832    442
+ C1  AMD                            0.55  0.7027  0.6667  0.6842     39
+ DR  DR                             0.45  0.7321  0.6165  0.6694    266
+ C6  Glaucoma                       0.40  0.5806  0.6207  0.6000     29
+ C7  Hypertensive_Retinopathy       0.20  0.5000  0.2800  0.3590     25
+ C8  Pathological_Myopia            0.80  0.8923  0.8529  0.8722     68
+ C9  Tessellated_Fundus             0.15  0.6731  0.8537  0.7527     41
+C10  Vitreous_Degeneration          0.10  0.8333  0.9091  0.8696     11
+C11  BRVO                           0.60  0.9333  0.8000  0.8615     35
+C13  Large_Optic_Cup                0.90  0.8167  0.7656  0.7903     64
+C14  Drusen                         0.35  0.6000  0.6234  0.6115     77
+C15  Epiretinal_Membrane            0.10  0.6719  0.7167  0.6935     60
+C18  Optic_Disc_Edema               0.20  0.7222  0.9286  0.8125     14
+C19  Myelinated_Nerve_Fibers        0.20  0.6667  0.6667  0.6667      9
+C22  Retinal_Detachment             0.10  1.0000  1.0000  1.0000      9
+C25  Refractive_Media_Opacity       0.25  0.8590  0.8171  0.8375    164
+C27  CSC                            0.45  0.9091  0.9091  0.9091     11
+C29  Laser_Spots                    0.40  0.8750  0.4667  0.6087     15
+C32  CRVO                           0.10  1.0000  0.8889  0.9412      9
+------------------------------------------------------------------------
+
+Macro  P=0.7721  R=0.7510  F1=0.7538
+Metrics saved → EXPERIMENTS/SWIN_V1/swin_evaluation.txt
+Confusion matrices saved → EXPERIMENTS/SWIN_V1/confusion_matrices.png
+
+All outputs written to: EXPERIMENTS/SWIN_V1/
