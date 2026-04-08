@@ -496,9 +496,9 @@ def run_inference(
 # EXAMPLE USAGE
 # ============================================================
 if __name__ == "__main__":
-    checkpoint_path = "EXPERIMENTS/V1/best_classifier.pt"   # your trained classifier checkpoint
+    checkpoint_path = "EXPERIMENTS/ResNext_V2 (Encoder Unfreeze)/best_classifier.pt"   # your trained classifier checkpoint
     input_path = "DATASET/Testing_Data"                           # folder or single image
-    output_dir = "INFERENCE/FUNDUS INFERENCE RESULTS V1/"
+    output_dir = "INFERENCE/INFERENCE RESULTS/FUNDUS INFERENCE RESULTS V2/"
 
     run_inference(
         checkpoint_path=checkpoint_path,
