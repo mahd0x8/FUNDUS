@@ -1,108 +1,180 @@
-========================================================================
+====================================================================================
   FUNDUS MODEL COMPARISON REPORT
-========================================================================
+  5 Experiments  |  19-class Multi-Label Classification  |  Test set n=1,262
+====================================================================================
 
-── 1. OVERALL MACRO RANKING (test set, n=1,262) ─────────────────────────
-  Rank  Model                Macro P   Macro R   Macro F1  Architecture
-  --------------------------------------------------------------------------------
-  1     SWIN_V1               0.7721    0.7510     0.7538  Swin-Large
-  2     V1 (SupCon)           0.7495    0.6807     0.7057  ResNeXt50 + SupCon
-  3     CNN_V1                0.6274    0.7408     0.6699  ConvNeXt-Base
+── 1. OVERALL MACRO RANKING ─────────────────────────────────────────────────────
+  Rank     Model                    Macro P   Macro R   Macro F1  Architecture
+  ----------------------------------------------------------------------------------------
+  ★ 1st    SWIN_V1                   0.7721    0.7510     0.7538  Swin-Large
+    2nd    ResNext_V2                0.7668    0.6826     0.7114  ResNeXt-50 + SupCon
+    3rd    ResNext_V1                0.7495    0.6807     0.7057  ResNeXt-50 + SupCon
+    4th    CNN_V1                    0.6274    0.7408     0.6699  ConvNeXt-Base
+    5th    RESNET_V1                 0.6158    0.6559     0.6266  ResNet-50
 
-  ★  Best model overall: SWIN_V1  (Macro F1 = 0.7538)
+  Best model  : SWIN_V1  (Macro F1 = 0.7538)
+  Worst model : RESNET_V1  (Macro F1 = 0.6266)
+  F1 spread   : 0.6266 – 0.7538  (Δ = 0.1272)
 
-── 2. ARCHITECTURE DETAILS ──────────────────────────────────────────────
-  SWIN_V1
-    • Swin-Large
-    • 195.8M params
-    • 100 epochs
-    • ImageNet-22k pretrained
+── 2. ARCHITECTURE DETAILS ──────────────────────────────────────────────────────
+  Model                  Backbone                 Params     Epochs  Strategy
+  -------------------------------------------------------------------------------------
+  RESNET_V1              ResNet-50                 24.6M         50  End-to-end, ImageNet-1k  [F1=0.6266]
+  CNN_V1                 ConvNeXt-Base              ~87M         50  End-to-end, ImageNet-1k  [F1=0.6699]
+  SWIN_V1                Swin-Large               195.8M        100  End-to-end, ImageNet-22k  [F1=0.7538]
+  ResNext_V1             ResNeXt-50+SupCon          ~25M     100+30  2-stage SupCon, Enc frozen  [F1=0.7057]
+  ResNext_V2             ResNeXt-50+SupCon          ~25M  100+30+20  3-stage SupCon+Finetune  [F1=0.7114]
 
-  V1 (SupCon)
-    • ResNeXt50 + SupCon
-    • ~25M params
-    • 3-stage (100+30+20 epochs)
+  Training strategies:
+    • End-to-end     — backbone fine-tuned jointly with classifier (cross-entropy)
+    • SupCon freeze  — Stage1: SupCon encoder pre-training; Stage2: frozen encoder + CLS head
+    • SupCon finetune— Stage1+2 above; Stage3: entire network unfrozen and fine-tuned
 
-  CNN_V1
-    • ConvNeXt-Base
-    • ~87M params
-    • 50 epochs
-    • ImageNet-1k pretrained
+── 3. PER-CLASS F1 SCORES ───────────────────────────────────────────────────────
+  Code Disease                        RESNET_V1      CNN_V1     SWIN_V1  ResNext_V1  ResNext_V2    AvgF1  Winner
+  --------------------------------------------------------------------------------------------------------------
+  C0   Normal                        0.7337   0.7368   0.7832★  0.7599   0.7645    0.7556  SWIN_V1
+  C1   AMD                           0.5823   0.6279   0.6842★  0.5882   0.6400    0.6245  SWIN_V1
+  DR   Diabetic Retinopathy          0.5739   0.6346   0.6694   0.6542   0.6765★   0.6417  ResNext_V2
+  C6   Glaucoma                      0.4507   0.4528   0.6000   0.6102★  0.5000    0.5227  ResNext_V1
+  C7   Hypertensive Retinopathy      0.2800   0.3000   0.3590★  0.3333   0.3478    0.3240  SWIN_V1
+  C8   Pathological Myopia           0.8806★  0.8435   0.8722   0.8406   0.8511    0.8576  RESNET_V1
+  C9   Tessellated Fundus            0.6538   0.6727   0.7527★  0.6591   0.6905    0.6858  SWIN_V1
+  C10  Vitreous Degeneration         0.6000   0.7500   0.8696   0.9091★  0.8421    0.7942  ResNext_V1
+  C11  BRVO                          0.7419   0.8000   0.8615★  0.8438   0.8615★   0.8217  Tie
+  C13  Large Optic Cup               0.7714   0.6721   0.7903   0.7869   0.8182★   0.7678  ResNext_V2
+  C14  Drusen                        0.5285   0.5811   0.6115★  0.5793   0.5170    0.5635  SWIN_V1
+  C15  Epiretinal Membrane           0.4915   0.5755   0.6935★  0.5979   0.5957    0.5908  SWIN_V1
+  C18  Optic Disc Edema              0.8387   0.8276   0.8125   0.8485   0.9032★   0.8461  ResNext_V2
+  C19  Myelinated Nerve Fibers       0.3750   0.4348   0.6667★  0.5556   0.5714    0.5207  SWIN_V1
+  C22  Retinal Detachment            0.8889   0.8421   1.0000★  0.8750   0.8750    0.8962  SWIN_V1
+  C25  Refractive Media Opacity      0.8511★  0.8228   0.8375   0.8411   0.8509    0.8407  RESNET_V1
+  C27  CSC                           0.6957   0.7826   0.9091★  0.7500   0.8571    0.7989  SWIN_V1
+  C29  Laser Spots                   0.2609   0.5926   0.6087★  0.5000   0.4545    0.4833  SWIN_V1
+  C32  CRVO                          0.7059   0.7778   0.9412★  0.8750   0.9000    0.8400  SWIN_V1
 
-── 3. PER-CLASS F1 SCORES ───────────────────────────────────────────────
-  Code Disease                        SWIN_V1V1 (SupCon)    CNN_V1  Winner
+── 4. CLASS-LEVEL WIN COUNT ─────────────────────────────────────────────────────
+  RESNET_V1                2/19  ██
+  CNN_V1                   0/19  
+  SWIN_V1                 11/19  ███████████
+  ResNext_V1               2/19  ██
+  ResNext_V2               3/19  ███
+
+── 5. PAIRWISE MACRO F1 COMPARISON ─────────────────────────────────────────────
+  Model A                 Model B                     Δ F1  Better
   ------------------------------------------------------------------------
-  C0   Normal                        0.7832 ★  0.7599    0.7368    SWIN_V1
-  C1   AMD                           0.6842 ★  0.5882    0.6279    SWIN_V1
-  DR   Diabetic Retinopathy          0.6694 ★  0.6542    0.6346    SWIN_V1
-  C6   Glaucoma                      0.6000    0.6102 ★  0.4528    V1 (SupCon)
-  C7   Hypertensive Retinopathy      0.3590 ★  0.3333    0.3000    SWIN_V1
-  C8   Pathological Myopia           0.8722 ★  0.8406    0.8435    SWIN_V1
-  C9   Tessellated Fundus            0.7527 ★  0.6591    0.6727    SWIN_V1
-  C10  Vitreous Degeneration         0.8696    0.9091 ★  0.7500    V1 (SupCon)
-  C11  BRVO                          0.8615 ★  0.8438    0.8000    SWIN_V1
-  C13  Large Optic Cup               0.7903 ★  0.7869    0.6721    SWIN_V1
-  C14  Drusen                        0.6115 ★  0.5793    0.5811    SWIN_V1
-  C15  Epiretinal Membrane           0.6935 ★  0.5979    0.5755    SWIN_V1
-  C18  Optic Disc Edema              0.8125    0.8485 ★  0.8276    V1 (SupCon)
-  C19  Myelinated Nerve Fibers       0.6667 ★  0.5556    0.4348    SWIN_V1
-  C22  Retinal Detachment            1.0000 ★  0.8750    0.8421    SWIN_V1
-  C25  Refractive Media Opacity      0.8375    0.8411 ★  0.8228    V1 (SupCon)
-  C27  CSC                           0.9091 ★  0.7500    0.7826    SWIN_V1
-  C29  Laser Spots                   0.6087 ★  0.5000    0.5926    SWIN_V1
-  C32  CRVO                          0.9412 ★  0.8750    0.7778    SWIN_V1
+  SWIN_V1                 ResNext_V2               +0.0424  SWIN_V1
+  SWIN_V1                 ResNext_V1               +0.0481  SWIN_V1
+  SWIN_V1                 CNN_V1                   +0.0839  SWIN_V1
+  SWIN_V1                 RESNET_V1                +0.1272  SWIN_V1
+  ResNext_V2              ResNext_V1               +0.0057  ResNext_V2
+  ResNext_V2              CNN_V1                   +0.0415  ResNext_V2
+  ResNext_V2              RESNET_V1                +0.0848  ResNext_V2
+  ResNext_V1              CNN_V1                   +0.0358  ResNext_V1
+  ResNext_V1              RESNET_V1                +0.0791  ResNext_V1
+  CNN_V1                  RESNET_V1                +0.0433  CNN_V1
 
-── 4. CLASS-LEVEL WIN COUNT ─────────────────────────────────────────────
-  SWIN_V1             wins on 15/19 classes
-  V1 (SupCon)         wins on 4/19 classes
-  CNN_V1              wins on 0/19 classes
+── 6. BEST MODEL (SWIN_V1) — PER-CLASS F1 GAPS vs ALL OTHERS ───────────────────
+  Code Disease                           SWIN_V1  Δ vs ResNext_V2  Δ vs ResNext_V1      Δ vs CNN_V1   Δ vs RESNET_V1
+  ------------------------------------------------------------------------------------------------------------------
+  C0   Normal                             0.7832  +        0.0187  +        0.0233  +        0.0464  +        0.0495
+  C1   AMD                                0.6842  +        0.0442  +        0.0960  +        0.0563  +        0.1019
+  DR   Diabetic Retinopathy               0.6694         -0.0071  +        0.0152  +        0.0348  +        0.0955
+  C6   Glaucoma                           0.6000  +        0.1000         -0.0102  +        0.1472  +        0.1493
+  C7   Hypertensive Retinopathy           0.3590  +        0.0112  +        0.0257  +        0.0590  +        0.0790
+  C8   Pathological Myopia                0.8722  +        0.0211  +        0.0316  +        0.0287         -0.0084
+  C9   Tessellated Fundus                 0.7527  +        0.0622  +        0.0936  +        0.0800  +        0.0989
+  C10  Vitreous Degeneration              0.8696  +        0.0275         -0.0395  +        0.1196  +        0.2696
+  C11  BRVO                               0.8615  +        0.0000  +        0.0177  +        0.0615  +        0.1196
+  C13  Large Optic Cup                    0.7903         -0.0279  +        0.0034  +        0.1182  +        0.0189
+  C14  Drusen                             0.6115  +        0.0945  +        0.0322  +        0.0304  +        0.0830
+  C15  Epiretinal Membrane                0.6935  +        0.0978  +        0.0956  +        0.1180  +        0.2020
+  C18  Optic Disc Edema                   0.8125         -0.0907         -0.0360         -0.0151         -0.0262
+  C19  Myelinated Nerve Fibers            0.6667  +        0.0953  +        0.1111  +        0.2319  +        0.2917
+  C22  Retinal Detachment                 1.0000  +        0.1250  +        0.1250  +        0.1579  +        0.1111
+  C25  Refractive Media Opacity           0.8375         -0.0134         -0.0036  +        0.0147         -0.0136
+  C27  CSC                                0.9091  +        0.0520  +        0.1591  +        0.1265  +        0.2134
+  C29  Laser Spots                        0.6087  +        0.1542  +        0.1087  +        0.0161  +        0.3478
+  C32  CRVO                               0.9412  +        0.0412  +        0.0662  +        0.1634  +        0.2353
 
-── 5. SWIN_V1 vs V1 (SupCon) — LARGEST F1 GAPS ──────────────────────────
-  Code Disease                         SWIN_V1    V1 (SupCon)      Δ F1
+── 7. HARDEST CLASSES (lowest average F1 across all models) ────────────────────
+  Code Disease                        Avg F1    Min F1    Max F1   Support
   ------------------------------------------------------------------------
-  C27  CSC                              0.9091         0.7500  + 0.1591
-  C22  Retinal Detachment               1.0000         0.8750  + 0.1250
-  C19  Myelinated Nerve Fibers          0.6667         0.5556  + 0.1111
-  C29  Laser Spots                      0.6087         0.5000  + 0.1087
-  C1   AMD                              0.6842         0.5882  + 0.0960
-  C15  Epiretinal Membrane              0.6935         0.5979  + 0.0956
-  C9   Tessellated Fundus               0.7527         0.6591  + 0.0936
-  C32  CRVO                             0.9412         0.8750  + 0.0662
-  C10  Vitreous Degeneration            0.8696         0.9091  -0.0395
-  C18  Optic Disc Edema                 0.8125         0.8485  -0.0360
-  C14  Drusen                           0.6115         0.5793  + 0.0322
-  C8   Pathological Myopia              0.8722         0.8406  + 0.0316
-  C7   Hypertensive Retinopathy         0.3590         0.3333  + 0.0257
-  C0   Normal                           0.7832         0.7599  + 0.0233
-  C11  BRVO                             0.8615         0.8438  + 0.0177
-  DR   Diabetic Retinopathy             0.6694         0.6542  + 0.0152
-  C6   Glaucoma                         0.6000         0.6102  -0.0102
-  C25  Refractive Media Opacity         0.8375         0.8411  -0.0036
-  C13  Large Optic Cup                  0.7903         0.7869  + 0.0034
+  C7   Hypertensive Retinopathy       0.3240    0.2800    0.3590        25
+  C29  Laser Spots                    0.4833    0.2609    0.6087        15
+  C19  Myelinated Nerve Fibers        0.5207    0.3750    0.6667         9
+  C6   Glaucoma                       0.5227    0.4507    0.6102        29
+  C14  Drusen                         0.5635    0.5170    0.6115        77
+  C15  Epiretinal Membrane            0.5908    0.4915    0.6935        60
+  C1   AMD                            0.6245    0.5823    0.6842        39
+  DR   Diabetic Retinopathy           0.6417    0.5739    0.6765       266
+  C9   Tessellated Fundus             0.6858    0.6538    0.7527        41
+  C0   Normal                         0.7556    0.7337    0.7832       442
+  C13  Large Optic Cup                0.7678    0.6721    0.8182        64
+  C10  Vitreous Degeneration          0.7942    0.6000    0.9091        11
+  C27  CSC                            0.7989    0.6957    0.9091        11
+  C11  BRVO                           0.8217    0.7419    0.8615        35
+  C32  CRVO                           0.8400    0.7059    0.9412         9
+  C25  Refractive Media Opacity       0.8407    0.8228    0.8511       164
+  C18  Optic Disc Edema               0.8461    0.8125    0.9032        14
+  C8   Pathological Myopia            0.8576    0.8406    0.8806        68
+  C22  Retinal Detachment             0.8962    0.8421    1.0000         9
 
-── 6. HARDEST CLASSES (lowest average F1 across all models) ─────────────
+── 8. EASIEST CLASSES (highest average F1 across all models) ───────────────────
   Code Disease                        Avg F1   Support
-  ------------------------------------------------------
-  C7   Hypertensive Retinopathy       0.3308        25
-  C19  Myelinated Nerve Fibers        0.5524         9
-  C6   Glaucoma                       0.5543        29
-  C29  Laser Spots                    0.5671        15
-  C14  Drusen                         0.5906        77
-  C15  Epiretinal Membrane            0.6223        60
-  C1   AMD                            0.6334        39
-  DR   Diabetic Retinopathy           0.6527       266
-  C9   Tessellated Fundus             0.6948        41
-  C13  Large Optic Cup                0.7498        64
-  C0   Normal                         0.7600       442
-  C27  CSC                            0.8139        11
-  C18  Optic Disc Edema               0.8295        14
-  C25  Refractive Media Opacity       0.8338       164
-  C11  BRVO                           0.8351        35
-  C10  Vitreous Degeneration          0.8429        11
-  C8   Pathological Myopia            0.8521        68
-  C32  CRVO                           0.8647         9
-  C22  Retinal Detachment             0.9057         9
+  ----------------------------------------------------
+  C22  Retinal Detachment             0.8962         9
+  C8   Pathological Myopia            0.8576        68
+  C18  Optic Disc Edema               0.8461        14
+  C25  Refractive Media Opacity       0.8407       164
+  C32  CRVO                           0.8400         9
+  C11  BRVO                           0.8217        35
+  C27  CSC                            0.7989        11
+  C10  Vitreous Degeneration          0.7942        11
+  C13  Large Optic Cup                0.7678        64
+  C0   Normal                         0.7556       442
 
-========================================================================
+── 9. ENCODER FREEZE vs UNFREEZE (ResNext_V1 vs ResNext_V2) ────────────────────
+  ResNext_V1 (2-stage, frozen encoder) Macro F1 = 0.7057
+  ResNext_V2 (3-stage, full finetune)  Macro F1 = 0.7114
+  Effect of encoder fine-tuning: +0.0057  (improvement)
+
+  Code Disease                         V1 F1    V2 F1   Δ(V2-V1)  Better
+  ------------------------------------------------------------------
+  C0   Normal                         0.7599   0.7645 +   0.0046  ResNext_V2
+  C1   AMD                            0.5882   0.6400 +   0.0518  ResNext_V2
+  DR   Diabetic Retinopathy           0.6542   0.6765 +   0.0223  ResNext_V2
+  C6   Glaucoma                       0.6102   0.5000   -0.1102  ResNext_V1
+  C7   Hypertensive Retinopathy       0.3333   0.3478 +   0.0145  ResNext_V2
+  C8   Pathological Myopia            0.8406   0.8511 +   0.0105  ResNext_V2
+  C9   Tessellated Fundus             0.6591   0.6905 +   0.0314  ResNext_V2
+  C10  Vitreous Degeneration          0.9091   0.8421   -0.0670  ResNext_V1
+  C11  BRVO                           0.8438   0.8615 +   0.0177  ResNext_V2
+  C13  Large Optic Cup                0.7869   0.8182 +   0.0313  ResNext_V2
+  C14  Drusen                         0.5793   0.5170   -0.0623  ResNext_V1
+  C15  Epiretinal Membrane            0.5979   0.5957   -0.0022  ResNext_V1
+  C18  Optic Disc Edema               0.8485   0.9032 +   0.0547  ResNext_V2
+  C19  Myelinated Nerve Fibers        0.5556   0.5714 +   0.0158  ResNext_V2
+  C22  Retinal Detachment             0.8750   0.8750 +   0.0000  ~Tie
+  C25  Refractive Media Opacity       0.8411   0.8509 +   0.0098  ResNext_V2
+  C27  CSC                            0.7500   0.8571 +   0.1071  ResNext_V2
+  C29  Laser Spots                    0.5000   0.4545   -0.0455  ResNext_V1
+  C32  CRVO                           0.8750   0.9000 +   0.0250  ResNext_V2
+
+  Classes improved by finetune : 13/19
+  Classes regressed by finetune: 5/19
+
+── 10. EFFICIENCY ANALYSIS (Parameters vs Macro F1) ───────────────────────────
+  Model                    Params (M)   Macro F1    F1 per 10M params
+  ----------------------------------------------------------------------
+  SWIN_V1                       195.8     0.7538               0.0385
+  ResNext_V2                     25.0     0.7114               0.2846
+  ResNext_V1                     25.0     0.7057               0.2823
+  CNN_V1                         87.0     0.6699               0.0770
+  RESNET_V1                      24.6     0.6266               0.2547
+
+  Note: SupCon models have additional SupCon pre-training compute not reflected above.
+
+====================================================================================
   END OF REPORT
-========================================================================
+====================================================================================
