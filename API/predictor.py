@@ -1,12 +1,13 @@
 """
 predictor.py — Model loading, preprocessing, GradCAM, and inference logic.
-Adapted from INFERENCE/inference.py to work fully in-memory (no file I/O).
+Adapted for SWIN_V1 (timm Swin-Large + 2-layer MLP head).
 """
 
 import warnings
 import base64
 from typing import List, Tuple, Optional
 
+import timm
 import cv2
 import numpy as np
 import torch
@@ -14,7 +15,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
-from torchvision.models import resnext50_32x4d, ResNeXt50_32X4D_Weights
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -55,53 +55,38 @@ IMAGE_SIZE = 224
 
 # ============================================================
 # MODEL ARCHITECTURE
+#
+# Checkpoint structure (EXPERIMENTS/SWIN_V1/best_swin.pt):
+#   backbone.*  — timm swin_large_patch4_window7_224 (num_classes=0)
+#   head.0.*    — nn.Linear(1536 → 512)
+#   head.1      — nn.GELU()           (no params)
+#   head.2      — nn.Dropout(0.3)     (no params)
+#   head.3.*    — nn.Linear(512 → 19)
 # ============================================================
 
-class ProjectionHead(nn.Module):
-    def __init__(self, in_dim=2048, hidden_dim=512, out_dim=128):
+class SwinClassifier(nn.Module):
+    def __init__(self, num_classes: int):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(in_dim, hidden_dim),
-            nn.ReLU(inplace=True),
-            nn.Linear(hidden_dim, out_dim),
+        self.backbone = timm.create_model(
+            "swin_large_patch4_window7_224",
+            pretrained=False,
+            num_classes=0,      # raw pooled features, no built-in head
+        )
+        feat_dim = self.backbone.num_features   # 1536
+        self.head = nn.Sequential(
+            nn.Linear(feat_dim, 512),
+            nn.GELU(),
+            nn.Dropout(0.3),
+            nn.Linear(512, num_classes),
         )
 
     def forward(self, x):
-        return self.net(x)
+        features = self.backbone(x)   # [B, 1536]
+        return self.head(features)
 
 
-class SupConEncoder(nn.Module):
-    def __init__(self, pretrained=False):
-        super().__init__()
-        weights = ResNeXt50_32X4D_Weights.DEFAULT if pretrained else None
-        backbone = resnext50_32x4d(weights=weights)
-        self.encoder = nn.Sequential(*list(backbone.children())[:-1])
-        self.feature_dim = 2048
-        self.projection = ProjectionHead(in_dim=2048, hidden_dim=512, out_dim=128)
-
-    def encode(self, x):
-        return self.encoder(x).flatten(1)
-
-    def forward(self, x):
-        feat = self.encode(x)
-        proj = F.normalize(self.projection(feat), dim=1)
-        return feat, proj
-
-
-class LinearClassifier(nn.Module):
-    def __init__(self, encoder: nn.Module, num_classes: int):
-        super().__init__()
-        self.encoder = encoder
-        self.classifier = nn.Linear(2048, num_classes)
-
-    def forward(self, x):
-        feat = self.encoder(x).flatten(1)
-        return self.classifier(feat)
-
-
-def load_model(checkpoint_path: str, device: str) -> LinearClassifier:
-    supcon = SupConEncoder(pretrained=False)
-    model = LinearClassifier(encoder=supcon.encoder, num_classes=len(LABEL_COLS))
+def load_model(checkpoint_path: str, device: str) -> SwinClassifier:
+    model = SwinClassifier(num_classes=len(LABEL_COLS))
     ckpt = torch.load(checkpoint_path, map_location=device)
     state_dict = ckpt["model"] if "model" in ckpt else ckpt
     model.load_state_dict(state_dict, strict=True)
@@ -187,23 +172,33 @@ def preprocess_fundus_bytes(image_bytes: bytes, image_size: int = IMAGE_SIZE) ->
 
 
 # ============================================================
-# GRAD-CAM
+# GRAD-CAM  (Swin-specific)
+#
+# timm's Swin stages output [B, H, W, C] (channels-last).
+# Grad-CAM weight averaging is over spatial dims (0, 1) of the
+# per-sample slice; the weighted channel sum is over dim -1,
+# yielding a [H, W] attention map.
+#
+# Target layer: model.backbone.layers[-1]
+#   → last SwinTransformerStage, output [B, 7, 7, 1536] at 224px
 # ============================================================
 
-class GradCAM:
-    """Single-use Grad-CAM wrapper. Call remove_hooks() when done."""
+class GradCAMSwin:
+    """Single-use Grad-CAM wrapper for Swin Transformer. Call remove_hooks() when done."""
 
     def __init__(self, model: nn.Module, target_layer: nn.Module):
         self.model = model
         self._activations: Optional[torch.Tensor] = None
-        self._gradients: Optional[torch.Tensor] = None
+        self._gradients:   Optional[torch.Tensor] = None
         self._fh = target_layer.register_forward_hook(self._fwd_hook)
         self._bh = target_layer.register_full_backward_hook(self._bwd_hook)
 
     def _fwd_hook(self, module, inp, out):
+        # out: [B, H, W, C]
         self._activations = out
 
     def _bwd_hook(self, module, grad_in, grad_out):
+        # grad_out[0]: [B, H, W, C]
         self._gradients = grad_out[0]
 
     def remove_hooks(self):
@@ -216,12 +211,17 @@ class GradCAM:
         logits = self.model(input_tensor)
         logits[0, class_idx].backward()
 
-        grads = self._gradients[0]           # [C, H, W]
-        acts  = self._activations[0]         # [C, H, W]
-        weights = grads.mean(dim=(1, 2), keepdim=True)
-        cam = F.relu((weights * acts).sum(dim=0))
+        # Drop batch dim → [H, W, C]
+        acts  = self._activations[0]   # [H, W, C]
+        grads = self._gradients[0]     # [H, W, C]
 
-        cam = cam.detach().cpu().numpy()
+        # Average gradients over spatial dims → channel importance weights [C]
+        weights = grads.mean(dim=(0, 1))        # [C]
+
+        # Weighted channel sum → spatial attention map [H, W]
+        cam = F.relu((acts * weights).sum(dim=-1))   # [H, W]
+
+        cam = cam.detach().cpu().numpy().astype(np.float32)
         if cam.max() > 0:
             cam /= cam.max()
         return cam
@@ -258,7 +258,7 @@ def numpy_to_base64(img_bgr: np.ndarray) -> str:
 # ============================================================
 
 def predict(
-    model: LinearClassifier,
+    model: SwinClassifier,
     image_bytes: bytes,
     device: str,
     threshold: float = 0.5,
@@ -302,8 +302,9 @@ def predict(
         selected = predictions[:top_k_if_none]
 
     # ── 5. GradCAM + segmentation per selected class ──────────────────────────
-    target_layer = model.encoder[-2]   # layer3 of ResNeXt50 (14×14 feature map)
-    gradcam = GradCAM(model, target_layer)
+    # Last SwinTransformerStage → [B, 7, 7, 1536] for 224×224 input
+    target_layer = model.backbone.layers[-1]
+    gradcam = GradCAMSwin(model, target_layer)
     visuals = []
 
     for item in selected:

@@ -32,7 +32,7 @@ from pydantic import BaseModel, Field
 _HERE       = os.path.dirname(os.path.abspath(__file__))
 _CHECKPOINT = os.environ.get(
     "CHECKPOINT_PATH",
-    os.path.join(_HERE, "..", "EXPERIMENTS", "V1", "best_classifier.pt"),
+    os.path.join(_HERE, "..", "EXPERIMENTS", "SWIN_V1", "best_swin.pt"),
 )
 _DEVICE = os.environ.get("DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 
@@ -104,10 +104,11 @@ app = FastAPI(
     title="FUNDUS Disease Prediction API",
     description=(
         "Multi-label fundus image classifier for 19 retinal diseases. "
+        "Powered by Swin-Large (SWIN_V1, Macro F1=0.7538). "
         "Upload a fundus image and receive per-class probabilities together with "
         "GradCAM heatmaps, overlays, segmentation boundaries, and bounding boxes."
     ),
-    version="1.0.0",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
