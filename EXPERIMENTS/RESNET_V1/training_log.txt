@@ -41,3 +41,80 @@ Parameters : 24.6M  (ResNet-50 backbone + head)
 [ResNet] Epoch 030/50  loss=0.242698  val_f1=0.5617  bb_lr=3.52e-06  head_lr=3.46e-05  time=434.4s ★
 [ResNet] Epoch 031/50  loss=0.240289  val_f1=0.5506  bb_lr=3.23e-06  head_lr=3.17e-05  time=396.4s
 [ResNet] Epoch 032/50  loss=0.238758  val_f1=0.5640  bb_lr=2.94e-06  head_lr=2.88e-05  time=398.2s ★
+[ResNet] Epoch 033/50  loss=0.237229  val_f1=0.5588  bb_lr=2.67e-06  head_lr=2.60e-05  time=394.9s
+[ResNet] Epoch 034/50  loss=0.239013  val_f1=0.5626  bb_lr=2.40e-06  head_lr=2.33e-05  time=419.1s
+[ResNet] Epoch 035/50  loss=0.234507  val_f1=0.5650  bb_lr=2.14e-06  head_lr=2.07e-05  time=391.0s ★
+[ResNet] Epoch 036/50  loss=0.232804  val_f1=0.5672  bb_lr=1.89e-06  head_lr=1.82e-05  time=386.9s ★
+[ResNet] Epoch 037/50  loss=0.228949  val_f1=0.5692  bb_lr=1.66e-06  head_lr=1.59e-05  time=391.2s ★
+[ResNet] Epoch 038/50  loss=0.230565  val_f1=0.5724  bb_lr=1.44e-06  head_lr=1.36e-05  time=387.8s ★
+[ResNet] Epoch 039/50  loss=0.226323  val_f1=0.5736  bb_lr=1.24e-06  head_lr=1.16e-05  time=389.2s ★
+[ResNet] Epoch 040/50  loss=0.221657  val_f1=0.5758  bb_lr=1.05e-06  head_lr=9.64e-06  time=388.7s ★
+[ResNet] Epoch 041/50  loss=0.226307  val_f1=0.5762  bb_lr=8.71e-07  head_lr=7.88e-06  time=390.3s ★
+[ResNet] Epoch 042/50  loss=0.224972  val_f1=0.5688  bb_lr=7.12e-07  head_lr=6.28e-06  time=389.6s
+[ResNet] Epoch 043/50  loss=0.222791  val_f1=0.5756  bb_lr=5.71e-07  head_lr=4.85e-06  time=389.1s
+[ResNet] Epoch 044/50  loss=0.226871  val_f1=0.5687  bb_lr=4.48e-07  head_lr=3.61e-06  time=383.8s
+[ResNet] Epoch 045/50  loss=0.225105  val_f1=0.5717  bb_lr=3.42e-07  head_lr=2.54e-06  time=388.7s
+[ResNet] Epoch 046/50  loss=0.222063  val_f1=0.5734  bb_lr=2.56e-07  head_lr=1.67e-06  time=391.9s
+[ResNet] Epoch 047/50  loss=0.220895  val_f1=0.5761  bb_lr=1.88e-07  head_lr=9.85e-07  time=388.6s
+[ResNet] Epoch 048/50  loss=0.226562  val_f1=0.5734  bb_lr=1.39e-07  head_lr=4.94e-07  time=385.9s
+[ResNet] Epoch 049/50  loss=0.220333  val_f1=0.5743  bb_lr=1.10e-07  head_lr=1.99e-07  time=389.5s
+[ResNet] Epoch 050/50  loss=0.221550  val_f1=0.5742  bb_lr=1.00e-07  head_lr=1.00e-07  time=386.5s
+
+Restored best checkpoint (epoch 41,  val F1=0.5762)
+Training curves saved → EXPERIMENTS/RESNET_V1/training_curves.png
+
+--- Threshold Optimisation (val set) ---
+Code  Name                          Threshold
+---------------------------------------------
+ C0  Normal                             0.35
+ C1  AMD                                0.80
+ DR  DR                                 0.60
+ C6  Glaucoma                           0.80
+ C7  Hypertensive_Retinopathy           0.90
+ C8  Pathological_Myopia                0.75
+ C9  Tessellated_Fundus                 0.70
+C10  Vitreous_Degeneration              0.85
+C11  BRVO                               0.90
+C13  Large_Optic_Cup                    0.90
+C14  Drusen                             0.70
+C15  Epiretinal_Membrane                0.85
+C18  Optic_Disc_Edema                   0.90
+C19  Myelinated_Nerve_Fibers            0.75
+C22  Retinal_Detachment                 0.80
+C25  Refractive_Media_Opacity           0.70
+C27  CSC                                0.90
+C29  Laser_Spots                        0.80
+C32  CRVO                               0.75
+
+============================================================
+  EVALUATION — TEST SET
+============================================================
+Per-class results
+Code  Name                            Thr       P       R      F1      S
+------------------------------------------------------------------------
+ C0  Normal                         0.35  0.6050  0.9321  0.7337    442
+ C1  AMD                            0.80  0.5750  0.5897  0.5823     39
+ DR  DR                             0.60  0.5340  0.6203  0.5739    266
+ C6  Glaucoma                       0.80  0.3810  0.5517  0.4507     29
+ C7  Hypertensive_Retinopathy       0.90  0.2800  0.2800  0.2800     25
+ C8  Pathological_Myopia            0.75  0.8939  0.8676  0.8806     68
+ C9  Tessellated_Fundus             0.70  0.5397  0.8293  0.6538     41
+C10  Vitreous_Degeneration          0.85  0.6667  0.5455  0.6000     11
+C11  BRVO                           0.90  0.8519  0.6571  0.7419     35
+C13  Large_Optic_Cup                0.90  0.7105  0.8438  0.7714     64
+C14  Drusen                         0.70  0.4397  0.6623  0.5285     77
+C15  Epiretinal_Membrane            0.85  0.5000  0.4833  0.4915     60
+C18  Optic_Disc_Edema               0.90  0.7647  0.9286  0.8387     14
+C19  Myelinated_Nerve_Fibers        0.75  0.4286  0.3333  0.3750      9
+C22  Retinal_Detachment             0.80  0.8889  0.8889  0.8889      9
+C25  Refractive_Media_Opacity       0.70  0.8485  0.8537  0.8511    164
+C27  CSC                            0.90  0.6667  0.7273  0.6957     11
+C29  Laser_Spots                    0.80  0.3750  0.2000  0.2609     15
+C32  CRVO                           0.75  0.7500  0.6667  0.7059      9
+------------------------------------------------------------------------
+
+Macro  P=0.6158  R=0.6559  F1=0.6266
+Metrics saved → EXPERIMENTS/RESNET_V1/resnet_evaluation.txt
+Confusion matrices saved → EXPERIMENTS/RESNET_V1/confusion_matrices.png
+
+All outputs written to: EXPERIMENTS/RESNET_V1/
