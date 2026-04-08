@@ -1,11 +1,10 @@
 import os
 import cv2
 import json
-import math
-import random
 import warnings
 from typing import List, Tuple, Optional
 
+import timm
 import torch
 import numpy as np
 import pandas as pd
@@ -14,7 +13,6 @@ from PIL import Image
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
-from torchvision.models import resnext50_32x4d, ResNeXt50_32X4D_Weights
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -63,7 +61,7 @@ def ensure_dir(path: str):
 
 # ============================================================
 # PREPROCESSING
-# Same as training
+# Same pipeline as training
 # ============================================================
 
 def remove_black_borders(img_bgr: np.ndarray, threshold: int = 10) -> np.ndarray:
@@ -164,58 +162,38 @@ def get_eval_transform():
 
 # ============================================================
 # MODEL
+#
+# Checkpoint structure (from best_swin.pt):
+#   backbone.*  — timm swin_large_patch4_window7_224 (num_classes=0)
+#   head.0.*    — nn.Linear(1536, 512)
+#   head.1      — nn.GELU()          (no params)
+#   head.2      — nn.Dropout(0.3)    (no params)
+#   head.3.*    — nn.Linear(512, 19)
 # ============================================================
 
-class ProjectionHead(nn.Module):
-    def __init__(self, in_dim=2048, hidden_dim=512, out_dim=128):
+class SwinClassifier(nn.Module):
+    def __init__(self, num_classes: int):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(in_dim, hidden_dim),
-            nn.ReLU(inplace=True),
-            nn.Linear(hidden_dim, out_dim),
+        self.backbone = timm.create_model(
+            "swin_large_patch4_window7_224",
+            pretrained=False,
+            num_classes=0,      # raw pooled features, no built-in head
+        )
+        feat_dim = self.backbone.num_features   # 1536
+        self.head = nn.Sequential(
+            nn.Linear(feat_dim, 512),
+            nn.GELU(),
+            nn.Dropout(0.3),
+            nn.Linear(512, num_classes),
         )
 
     def forward(self, x):
-        return self.net(x)
+        features = self.backbone(x)   # [B, 1536]
+        return self.head(features)
 
 
-class SupConEncoder(nn.Module):
-    def __init__(self, pretrained=True):
-        super().__init__()
-        weights = ResNeXt50_32X4D_Weights.DEFAULT if pretrained else None
-        backbone = resnext50_32x4d(weights=weights)
-        self.encoder = nn.Sequential(*list(backbone.children())[:-1])
-        self.feature_dim = 2048
-        self.projection = ProjectionHead(in_dim=2048, hidden_dim=512, out_dim=128)
-
-    def encode(self, x):
-        feat = self.encoder(x).flatten(1)
-        return feat
-
-    def forward(self, x):
-        feat = self.encode(x)
-        proj = self.projection(feat)
-        proj = F.normalize(proj, dim=1)
-        return feat, proj
-
-
-class LinearClassifier(nn.Module):
-    def __init__(self, encoder: nn.Module, num_classes: int):
-        super().__init__()
-        self.encoder = encoder
-        self.classifier = nn.Linear(2048, num_classes)
-
-    def forward(self, x):
-        feat = self.encoder(x).flatten(1)
-        return self.classifier(feat)
-
-
-def build_classifier_model(num_classes: int, checkpoint_path: str, device: str):
-    supcon_model = SupConEncoder(pretrained=False)
-    model = LinearClassifier(
-        encoder=supcon_model.encoder,
-        num_classes=num_classes
-    )
+def build_swin_model(num_classes: int, checkpoint_path: str, device: str) -> nn.Module:
+    model = SwinClassifier(num_classes=num_classes)
 
     ckpt = torch.load(checkpoint_path, map_location=device)
     state_dict = ckpt["model"] if "model" in ckpt else ckpt
@@ -226,23 +204,32 @@ def build_classifier_model(num_classes: int, checkpoint_path: str, device: str):
 
 
 # ============================================================
-# GRAD-CAM
+# GRAD-CAM  (Swin-specific)
+#
+# timm's Swin stages output [B, H, W, C] (channels-last).
+# Standard Grad-CAM averaging must be done over spatial dims
+# (0, 1) of the per-sample slice; the weighted channel sum
+# is over dim -1 to produce a [H, W] attention map.
+#
+# Target layer: model.backbone.layers[-1]
+#   → last transformer stage, output [B, 7, 7, 1536] at 224px
 # ============================================================
 
-class GradCAM:
+class GradCAMSwin:
     def __init__(self, model: nn.Module, target_layer: nn.Module):
         self.model = model
-        self.target_layer = target_layer
-        self.activations = None
-        self.gradients = None
+        self.activations: Optional[torch.Tensor] = None
+        self.gradients: Optional[torch.Tensor] = None
 
-        self.forward_handle = target_layer.register_forward_hook(self._forward_hook)
+        self.forward_handle  = target_layer.register_forward_hook(self._forward_hook)
         self.backward_handle = target_layer.register_full_backward_hook(self._backward_hook)
 
     def _forward_hook(self, module, input, output):
+        # output: [B, H, W, C]
         self.activations = output
 
     def _backward_hook(self, module, grad_input, grad_output):
+        # grad_output[0]: [B, H, W, C]
         self.gradients = grad_output[0]
 
     def remove_hooks(self):
@@ -253,32 +240,32 @@ class GradCAM:
         self.model.zero_grad()
 
         logits = self.model(input_tensor)   # [1, num_classes]
-        score = logits[0, class_idx]
+        score  = logits[0, class_idx]
         score.backward()
 
-        # activations: [1, C, H, W]
-        # gradients:   [1, C, H, W]
-        grads = self.gradients[0]
-        acts = self.activations[0]
+        # Drop batch dim → [H, W, C]
+        acts  = self.activations[0]   # [H, W, C]
+        grads = self.gradients[0]     # [H, W, C]
 
-        weights = grads.mean(dim=(1, 2), keepdim=True)   # [C,1,1]
-        cam = (weights * acts).sum(dim=0)                # [H,W]
+        # Average gradients over spatial dims → channel importance [C]
+        weights = grads.mean(dim=(0, 1))     # [C]
+
+        # Weighted channel sum → spatial map [H, W]
+        cam = (acts * weights).sum(dim=-1)   # [H, W]
         cam = F.relu(cam)
 
-        cam = cam.detach().cpu().numpy()
+        cam = cam.detach().cpu().numpy().astype(np.float32)
         if cam.max() > 0:
-            cam = cam / cam.max()
+            cam /= cam.max()
 
         return cam
 
 
+# ============================================================
+# FUNDUS MASK + HEATMAP OVERLAY
+# ============================================================
+
 def get_fundus_mask(image_rgb: np.ndarray) -> np.ndarray:
-    """
-    Build a binary mask (uint8, 0/255) matching the fundus disc in a
-    preprocessed 224×224 image.  Runs HoughCircles on the image; if
-    detection fails falls back to the largest inscribed circle so the
-    mask always covers the visible retina and never the black corners.
-    """
     h, w = image_rgb.shape[:2]
     img_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
     circle = detect_fundus_circle(img_bgr)
@@ -300,16 +287,9 @@ def overlay_heatmap_on_image(
     mask: np.ndarray,
     alpha: float = 0.4,
 ) -> np.ndarray:
-    """
-    Overlay a Grad-CAM heatmap on the fundus image, constrained to the
-    fundus disc described by `mask`.
-
-    Inside the disc  : alpha-blend of original image + JET heatmap.
-    Outside the disc : original image pixels only (no heatmap bleed).
-    """
     h, w = image_rgb.shape[:2]
     cam_resized = cv2.resize(cam, (w, h))
-    cam_uint8 = np.uint8(255 * cam_resized)
+    cam_uint8   = np.uint8(255 * cam_resized)
 
     heatmap = cv2.applyColorMap(cam_uint8, cv2.COLORMAP_JET)
     heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
@@ -317,8 +297,7 @@ def overlay_heatmap_on_image(
     blended = np.float32(image_rgb) * (1 - alpha) + np.float32(heatmap) * alpha
     blended = np.clip(blended, 0, 255).astype(np.uint8)
 
-    # Restore original pixels everywhere outside the fundus circle
-    inside = (mask > 0)[:, :, np.newaxis]          # [H, W, 1] bool
+    inside = (mask > 0)[:, :, np.newaxis]
     result = np.where(inside, blended, image_rgb)
     return result.astype(np.uint8)
 
@@ -337,20 +316,19 @@ def predict_single_image(
     transform = get_eval_transform()
 
     pil_img, image_rgb = preprocess_fundus_image(image_path, image_size=image_size)
-
     tensor = transform(pil_img).unsqueeze(0).to(device)
 
     with torch.no_grad():
         logits = model(tensor)
-        probs = torch.sigmoid(logits)[0].cpu().numpy()
+        probs  = torch.sigmoid(logits)[0].cpu().numpy()
 
     results = []
     for i, col in enumerate(LABEL_COLS):
         results.append({
-            "label_code": col,
-            "label_name": CLASS_NAMES.get(col, col),
+            "label_code":  col,
+            "label_name":  CLASS_NAMES.get(col, col),
             "probability": float(probs[i]),
-            "predicted": int(probs[i] >= threshold)
+            "predicted":   int(probs[i] >= threshold),
         })
 
     results = sorted(results, key=lambda x: x["probability"], reverse=True)
@@ -368,48 +346,44 @@ def save_heatmaps(
 ):
     ensure_dir(output_dir)
 
-    original_image_path = os.path.join(output_dir, "original_image.png")
-    cv2.imwrite(original_image_path, cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR))
+    cv2.imwrite(
+        os.path.join(output_dir, "original_image.png"),
+        cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR),
+    )
 
-    # Detect the fundus circle once; all heatmaps for this image share the mask
     fundus_mask = get_fundus_mask(image_rgb)
 
-    # target layer = layer4 (not avgpool)
-    target_layer = model.encoder[-2]
-    gradcam = GradCAM(model, target_layer)
+    # Last transformer stage → [B, 7, 7, 1536] for 224×224 input
+    target_layer = model.backbone.layers[-1]
+    gradcam = GradCAMSwin(model, target_layer)
 
     selected = [r for r in results if r["probability"] >= threshold]
-
-    if len(selected) == 0:
+    if not selected:
         selected = results[:top_k_if_none]
 
     for item in selected:
         class_code = item["label_code"]
         class_name = item["label_name"]
-        class_idx = LABEL_COLS.index(class_code)
+        class_idx  = LABEL_COLS.index(class_code)
 
-        cam = gradcam.generate(input_tensor, class_idx)
+        cam     = gradcam.generate(input_tensor, class_idx)
         overlay = overlay_heatmap_on_image(image_rgb, cam, fundus_mask, alpha=0.4)
 
-        base_name = f"{class_code}_{class_name}_{item['probability']:.4f}".replace(" ", "_")
-        overlay_path = os.path.join(output_dir, f"{base_name}_overlay.png")
-        heatmap_path = os.path.join(output_dir, f"{base_name}_heatmap.png")
-        raw_path = os.path.join(output_dir, f"{base_name}_rawcam.npy")
-
-        h, w = image_rgb.shape[:2]
-        cam_uint8 = np.uint8(255 * cv2.resize(cam, (w, h)))
+        base_name   = f"{class_code}_{class_name}_{item['probability']:.4f}".replace(" ", "_")
+        h, w        = image_rgb.shape[:2]
+        cam_uint8   = np.uint8(255 * cv2.resize(cam, (w, h)))
         heatmap_bgr = cv2.applyColorMap(cam_uint8, cv2.COLORMAP_JET)
-        # Black out heatmap pixels that fall outside the fundus disc
-        heatmap_bgr[fundus_mask == 0] = 0
+        heatmap_bgr[fundus_mask == 0] = 0   # black out outside the disc
 
-        cv2.imwrite(overlay_path, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
-        cv2.imwrite(heatmap_path, heatmap_bgr)
-        np.save(raw_path, cam)
+        cv2.imwrite(os.path.join(output_dir, f"{base_name}_overlay.png"),
+                    cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
+        cv2.imwrite(os.path.join(output_dir, f"{base_name}_heatmap.png"), heatmap_bgr)
+        np.save(os.path.join(output_dir, f"{base_name}_rawcam.npy"), cam)
 
     gradcam.remove_hooks()
 
 
-def is_image_file(path: str):
+def is_image_file(path: str) -> bool:
     exts = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp"}
     return os.path.splitext(path)[1].lower() in exts
 
@@ -427,30 +401,29 @@ def run_inference(
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("Using device:", device)
 
-    model = build_classifier_model(
+    model = build_swin_model(
         num_classes=len(LABEL_COLS),
         checkpoint_path=checkpoint_path,
-        device=device
+        device=device,
     )
 
     if os.path.isfile(input_path):
         image_paths = [input_path]
     else:
-        image_paths = [
+        image_paths = sorted(
             os.path.join(input_path, f)
             for f in os.listdir(input_path)
             if is_image_file(os.path.join(input_path, f))
-        ]
-        image_paths = sorted(image_paths)
+        )
 
-    if len(image_paths) == 0:
+    if not image_paths:
         raise ValueError("No image files found.")
 
     all_rows = []
 
     for image_path in image_paths:
         print(f"\nProcessing: {image_path}")
-        image_name = os.path.splitext(os.path.basename(image_path))[0]
+        image_name    = os.path.splitext(os.path.basename(image_path))[0]
         image_out_dir = os.path.join(output_dir, image_name)
         ensure_dir(image_out_dir)
 
@@ -459,7 +432,7 @@ def run_inference(
             image_path=image_path,
             device=device,
             threshold=threshold,
-            image_size=image_size
+            image_size=image_size,
         )
 
         print("Top predictions:")
@@ -473,9 +446,9 @@ def run_inference(
             results=results,
             output_dir=image_out_dir,
             threshold=threshold,
-            top_k_if_none=top_k_if_none
+            top_k_if_none=top_k_if_none,
         )
-        # del cam, overlay
+
         torch.cuda.empty_cache()
         with open(os.path.join(image_out_dir, "predictions.json"), "w") as f:
             json.dump(results, f, indent=2)
@@ -496,15 +469,15 @@ def run_inference(
 # EXAMPLE USAGE
 # ============================================================
 if __name__ == "__main__":
-    checkpoint_path = "EXPERIMENTS/ResNext_V2 (Encoder Unfreeze)/best_classifier.pt"    # your trained classifier checkpoint
-    input_path = "DATASET/Testing_Data"                                                 # folder or single image
-    output_dir = "INFERENCE/INFERENCE RESULTS/FUNDUS INFERENCE RESULTS V2/"
+    checkpoint_path = "EXPERIMENTS/SWIN_V1/best_swin.pt"
+    input_path      = "DATASET/Testing_Data"
+    output_dir      = "INFERENCE/INFERENCE RESULTS/FUNDUS INFERENCE RESULTS SWIN_V1/"
 
     run_inference(
         checkpoint_path=checkpoint_path,
         input_path=input_path,
         output_dir=output_dir,
         threshold=0.5,
-        image_size=224,
+        image_size=IMAGE_SIZE,
         top_k_if_none=3,
     )

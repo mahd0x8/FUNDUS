@@ -5,7 +5,7 @@ import shutil
 from pathlib import Path
 
 
-BASE_DIR = Path("INFERENCE/FUNDUS INFERENCE RESULTS V1")
+BASE_DIR = Path("INFERENCE/INFERENCE RESULTS/FUNDUS INFERENCE RESULTS SWIN_V1")
 
 # Accept common image extensions and also extensionless files if OpenCV can read them
 VALID_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".webp", ""}
