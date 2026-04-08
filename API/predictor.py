@@ -227,18 +227,48 @@ class GradCAMSwin:
         return cam
 
 
-def _heatmap_bgr(cam: np.ndarray, target_hw: Tuple[int, int]) -> np.ndarray:
-    """Resize CAM and apply JET colormap → BGR uint8."""
-    cam_resized = cv2.resize(cam, (target_hw[1], target_hw[0]))
-    return cv2.applyColorMap(np.uint8(255 * cam_resized), cv2.COLORMAP_JET)
-
-
-def _overlay_heatmap(image_bgr: np.ndarray, cam: np.ndarray, alpha: float = 0.4) -> np.ndarray:
-    """Blend GradCAM heatmap onto the original image."""
+def _get_fundus_mask(image_bgr: np.ndarray) -> np.ndarray:
+    """
+    Build a binary mask (uint8, 0/255) for the fundus disc.
+    Falls back to the largest inscribed circle when HoughCircles fails.
+    """
     h, w = image_bgr.shape[:2]
-    heatmap = _heatmap_bgr(cam, (h, w))
-    overlay = np.float32(image_bgr) * (1 - alpha) + np.float32(heatmap) * alpha
-    return np.clip(overlay, 0, 255).astype(np.uint8)
+    circle = _detect_fundus_circle(image_bgr)
+    mask = np.zeros((h, w), dtype=np.uint8)
+    if circle is not None:
+        cx, cy, r = circle
+    else:
+        cx, cy = w // 2, h // 2
+        r = min(w, h) // 2
+    cv2.circle(mask, (cx, cy), r, 255, thickness=-1)
+    return mask
+
+
+def _heatmap_bgr(cam: np.ndarray, target_hw: Tuple[int, int],
+                 mask: Optional[np.ndarray] = None) -> np.ndarray:
+    """Resize CAM, apply JET colormap, and black out pixels outside the fundus disc."""
+    cam_resized = cv2.resize(cam, (target_hw[1], target_hw[0]))
+    heatmap = cv2.applyColorMap(np.uint8(255 * cam_resized), cv2.COLORMAP_JET)
+    if mask is not None:
+        heatmap[mask == 0] = 0
+    return heatmap
+
+
+def _overlay_heatmap(image_bgr: np.ndarray, cam: np.ndarray,
+                     mask: Optional[np.ndarray] = None,
+                     alpha: float = 0.4) -> np.ndarray:
+    """
+    Blend GradCAM heatmap onto the fundus image, confined to the fundus disc.
+    Pixels outside the disc are kept as-is from the original image.
+    """
+    h, w = image_bgr.shape[:2]
+    heatmap = _heatmap_bgr(cam, (h, w))   # mask not applied here — overlay handles it
+    blended = np.float32(image_bgr) * (1 - alpha) + np.float32(heatmap) * alpha
+    blended = np.clip(blended, 0, 255).astype(np.uint8)
+    if mask is not None:
+        inside = (mask > 0)[:, :, np.newaxis]
+        return np.where(inside, blended, image_bgr).astype(np.uint8)
+    return blended
 
 
 # ============================================================
@@ -305,15 +335,32 @@ def predict(
     # Last SwinTransformerStage → [B, 7, 7, 1536] for 224×224 input
     target_layer = model.backbone.layers[-1]
     gradcam = GradCAMSwin(model, target_layer)
+    fundus_mask = _get_fundus_mask(image_bgr)
     visuals = []
 
+    original_b64 = numpy_to_base64(image_bgr)
+
     for item in selected:
+        # Normal fundus — skip GradCAM/segmentation; show original image in all tabs
+        if item["label_code"] == "C0":
+            visuals.append({
+                "label_code":      item["label_code"],
+                "label_name":      item["label_name"],
+                "probability":     item["probability"],
+                "heatmap":         original_b64,
+                "overlay":         original_b64,
+                "polygon_overlay": original_b64,
+                "bounding_box":    original_b64,
+                "panel":           original_b64,
+            })
+            continue
+
         class_idx = LABEL_COLS.index(item["label_code"])
         cam = gradcam.generate(tensor, class_idx)
 
         h, w = image_bgr.shape[:2]
-        heatmap_bgr = _heatmap_bgr(cam, (h, w))
-        overlay_bgr = _overlay_heatmap(image_bgr, cam, alpha=0.4)
+        heatmap_bgr = _heatmap_bgr(cam, (h, w), mask=fundus_mask)
+        overlay_bgr = _overlay_heatmap(image_bgr, cam, mask=fundus_mask, alpha=0.4)
 
         seg = process_heatmap(image_bgr, heatmap_bgr, item["label_name"])
 
