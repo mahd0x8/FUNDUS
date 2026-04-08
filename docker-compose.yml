@@ -5,11 +5,12 @@ services:
     build:
       context: ./API
       dockerfile: Dockerfile
+      network: host        # use host DNS during build (apt-get / pip need internet)
     volumes:
-      # Mount the model checkpoint read-only — never bake 89 MB into the image
-      - ./EXPERIMENTS/V1/best_classifier.pt:/app/model/best_classifier.pt:ro
+      # Mount the model checkpoint read-only — never bake it into the image
+      - ./EXPERIMENTS/SWIN_V1/best_swin.pt:/app/model/best_swin.pt:ro
     environment:
-      CHECKPOINT_PATH: /app/model/best_classifier.pt
+      CHECKPOINT_PATH: /app/model/best_swin.pt
       DEVICE: cpu        # change to "cuda" and enable the GPU section below for GPU
     networks:
       - fundus

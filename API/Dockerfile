@@ -7,13 +7,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# System libraries required by OpenCV
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        libglib2.0-0 \
-        libgl1 \
-        libsm6 \
-        libxext6 \
-    && rm -rf /var/lib/apt/lists/*
+# opencv-python-headless bundles its own native libs; python:3.11-slim
+# already ships libglib2.0-0, so no apt-get step is needed.
 
 # Install CPU-only PyTorch first so subsequent `pip install -r requirements.txt`
 # doesn't pull in the larger CUDA wheel.
@@ -29,7 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Model checkpoint is mounted at runtime (see docker-compose.yml)
-ENV CHECKPOINT_PATH=/app/model/best_classifier.pt
+ENV CHECKPOINT_PATH=/app/model/best_swin.pt
 ENV DEVICE=cpu
 
 EXPOSE 8000
