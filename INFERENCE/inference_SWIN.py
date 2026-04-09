@@ -350,8 +350,11 @@ def save_heatmaps(
         os.path.join(output_dir, "original_image.png"),
         cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR),
     )
-
-    fundus_mask = get_fundus_mask(image_rgb)
+    
+    fundus_mask = cv2.cvtColor(image_rgb.copy(), cv2.COLOR_RGB2GRAY)  # single channel
+    fundus_mask[fundus_mask >= 30] = 255
+    fundus_mask[fundus_mask < 30]  = 0
+    fundus_mask = cv2.GaussianBlur(fundus_mask, (3, 3), 0)
 
     # Last transformer stage → [B, 7, 7, 1536] for 224×224 input
     target_layer = model.backbone.layers[-1]
@@ -470,8 +473,8 @@ def run_inference(
 # ============================================================
 if __name__ == "__main__":
     checkpoint_path = "EXPERIMENTS/SWIN_V1/best_swin.pt"
-    input_path      = "DATASET/Testing_Data"
-    output_dir      = "INFERENCE/INFERENCE RESULTS/FUNDUS INFERENCE RESULTS SWIN_V1/"
+    input_path      = "DATASET/Testing_Data/DR"
+    output_dir      = "INFERENCE/INFERENCE RESULTS/FUNDUS INFERENCE RESULTS SWIN_V1 TEST 1/"
 
     run_inference(
         checkpoint_path=checkpoint_path,

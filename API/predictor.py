@@ -232,16 +232,22 @@ def _get_fundus_mask(image_bgr: np.ndarray) -> np.ndarray:
     Build a binary mask (uint8, 0/255) for the fundus disc.
     Falls back to the largest inscribed circle when HoughCircles fails.
     """
-    h, w = image_bgr.shape[:2]
-    circle = _detect_fundus_circle(image_bgr)
-    mask = np.zeros((h, w), dtype=np.uint8)
-    if circle is not None:
-        cx, cy, r = circle
-    else:
-        cx, cy = w // 2, h // 2
-        r = min(w, h) // 2
-    cv2.circle(mask, (cx, cy), r, 255, thickness=-1)
-    return mask
+    # h, w = image_bgr.shape[:2]
+    # circle = _detect_fundus_circle(image_bgr)
+    # mask = np.zeros((h, w), dtype=np.uint8)
+    # if circle is not None:
+    #     cx, cy, r = circle
+    # else:
+    #     cx, cy = w // 2, h // 2
+    #     r = min(w, h) // 2
+    # cv2.circle(mask, (cx, cy), r, 255, thickness=-1)
+
+    fundus_mask = cv2.cvtColor(image_bgr.copy(), cv2.COLOR_BGR2GRAY)  # single channel
+    fundus_mask[fundus_mask >= 30] = 255
+    fundus_mask[fundus_mask < 30]  = 0
+    fundus_mask = cv2.GaussianBlur(fundus_mask, (3, 3), 0)
+    
+    return fundus_mask
 
 
 def _heatmap_bgr(cam: np.ndarray, target_hw: Tuple[int, int],

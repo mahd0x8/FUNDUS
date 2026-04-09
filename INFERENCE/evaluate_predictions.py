@@ -4,7 +4,7 @@ import os
 
 def evaluate():
     # Load data
-    results_file = 'INFERENCE/FUNDUS INFERENCE RESULTS V1/inference_results.csv'
+    results_file = 'INFERENCE/INFERENCE RESULTS/FUNDUS INFERENCE RESULTS V2/inference_results.csv'
     split_file = 'DATASET/filtered_data_split.csv'
     
     print("Loading csv files...")
