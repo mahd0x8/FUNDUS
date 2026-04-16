@@ -1,0 +1,5 @@
+outs:
+- md5: 21efcf8ec1df61ca6cae000e4613b080
+  size: 783306059
+  hash: md5
+  path: best_swin.pt

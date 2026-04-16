@@ -1,0 +1,5 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = azure://fundus01storage/MODELS
+    account_name = az001storage
